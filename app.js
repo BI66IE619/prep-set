@@ -5,116 +5,203 @@ const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
 function save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
-function load(key, fallback=""){ try{ return JSON.parse(localStorage.getItem(key)) || fallback; }catch{ return fallback; } }
+function load(key, fallback=""){ 
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } 
+  catch { return fallback; } 
+}
 
 function applyTheme(){ 
-  if(localStorage.getItem("theme")==="dark") $("#app").classList.add("dark"); 
+  if(load("theme")==="dark") $("#app").classList.add("dark");
 }
 applyTheme();
 
-$$(".nav-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    $$(".nav-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    $$(".panel").forEach(p=>p.classList.add("hidden"));
-    $("#" + btn.dataset.panel).classList.remove("hidden");
-  });
+/* -----------------------------------------------------
+   AUTO-LOAD SAVED DATA ON START
+------------------------------------------------------ */
+window.addEventListener("DOMContentLoaded", () => {
+  $("#gpa").value = load("gpa", "");
+  $("#interests").value = load("interests", "");
+  $("#major").value = load("major", "");
+  $("#year").value = load("year", "");
+  $("#scores").value = load("scores", "");
+  $("#collegeOutput").textContent = load("collegeData", "");
+
+  $("#planFocus").value = load("planFocus", "");
+  $("#planClubs").value = load("planClubs", "");
+  $("#planSkills").value = load("planSkills", "");
+  $("#planOutput").textContent = load("planData", "");
+
+  $("#essayInput").value = load("essayInput", "");
+  $("#essayOutput").textContent = load("essayData", "");
+
+  $("#resumeData").value = load("resumeData", "");
+  $("#resumeTips").textContent = load("resumeTips", "");
+
+  $("#interviewOutput").textContent = load("interviewPractice", "");
+  $("#interviewAnswer").value = load("interviewAnswer", "");
 });
 
+/* -----------------------------------------------------
+   SAVE USER INPUT AS THEY TYPE
+------------------------------------------------------ */
+[
+  "gpa","interests","major","year","scores",
+  "planFocus","planClubs","planSkills",
+  "essayInput","resumeData","interviewAnswer"
+].forEach(id=>{
+  const el = document.getElementById(id);
+  el.addEventListener("input", ()=> save(id, el.value));
+});
+
+/* -----------------------------------------------------
+   THEME BUTTON
+------------------------------------------------------ */
 $("#toggleTheme").addEventListener("click", ()=>{
   $("#app").classList.toggle("dark");
-  localStorage.setItem("theme", $("#app").classList.contains("dark") ? "dark" : "light");
+  save("theme", $("#app").classList.contains("dark") ? "dark" : "light");
 });
 
-async function ai(prompt, outputEl){
+/* -----------------------------------------------------
+   AI CALL FUNCTION WITH LOADING + SAVE
+------------------------------------------------------ */
+async function ai(prompt, outputEl, saveKey){
   outputEl.textContent = "Generating...";
+
   try{
     const resp = await fetch(GEMINI_ENDPOINT, {
       method:"POST",
       headers:{ "Content-Type":"application/json", "x-goog-api-key": GEMINI_API_KEY },
       body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] })
     });
+
     if(!resp.ok){
-      const txt = await resp.text();
-      console.error("Gemini Flash error:", resp.status, txt);
-      outputEl.textContent = "AI request failed: "+resp.status;
+      outputEl.textContent = "AI error: " + resp.status;
       return;
     }
+
     const data = await resp.json();
     let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
     text = formatOutput(text);
+
     outputEl.textContent = text;
+    save(saveKey, text);
     return text;
+
   }catch(err){
-    console.error(err);
-    outputEl.textContent = "AI request failed: network error.";
+    outputEl.textContent = "Network error";
   }
 }
 
+/* Format plain text output (remove markdown bullets) */
 function formatOutput(text){
-  return text.replace(/^[*\-#]+/gm, "").replace(/\n+/g,"\n").trim();
+  return text.replace(/^[*\-#]+/gm, "").replace(/\n{2,}/g,"\n").trim();
 }
 
-/* -------------------- COLLEGE -------------------- */
+/* -----------------------------------------------------
+   DOWNLOAD FUNCTION
+------------------------------------------------------ */
+function downloadFile(name, content){
+  const blob = new Blob([content], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+}
+
+/* -----------------------------------------------------
+   COLLEGE MATCH
+------------------------------------------------------ */
 $("#generateCollege").addEventListener("click", ()=>{
-  const outputEl = $("#collegeOutput");
-  const prompt = `Generate realistic college reach, target, and safety matches based on:
+  const out = $("#collegeOutput");
+  const prompt = `
+Generate realistic college reach, target, and safety matches based on:
 GPA: ${$("#gpa").value}
 Interests: ${$("#interests").value}
 Major: ${$("#major").value}
 Year: ${$("#year").value}
 Test Scores: ${$("#scores").value}
-Include 3 reach, 3 target, 3 safety schools. 1 sentence per school. Include tuition and location.`;
-  ai(prompt, outputEl).then(text=>save("collegeData", text));
+Return 3 reach, 3 target, 3 safety schools.`;
+
+  ai(prompt, out, "collegeData");
 });
 
-/* -------------------- 4-YEAR PLAN -------------------- */
+$("#downloadCollege").addEventListener("click", ()=>{
+  downloadFile("College_Matches.txt", $("#collegeOutput").textContent);
+});
+
+/* -----------------------------------------------------
+   4-YEAR PLAN
+------------------------------------------------------ */
 $("#generatePlan").addEventListener("click", ()=>{
-  const outputEl = $("#planOutput");
-  const prompt = `Create a personalized 4-year high school plan with:
+  const out = $("#planOutput");
+  const prompt = `
+Create a personalized 4-year plan with:
 Focus: ${$("#planFocus").value}
 Clubs: ${$("#planClubs").value}
 Skills: ${$("#planSkills").value}
-Include recommended courses, AP/Honors, extracurriculars, application timeline, and skill milestones.`;
-  ai(prompt, outputEl).then(text=>save("planData", text));
+Include AP/Honors suggestions and major skill milestones.`;
+
+  ai(prompt, out, "planData");
 });
 
-/* -------------------- ESSAY -------------------- */
+$("#downloadPlan").addEventListener("click", ()=>{
+  downloadFile("4_Year_Plan.txt", $("#planOutput").textContent);
+});
+
+/* -----------------------------------------------------
+   ESSAY HELPER
+------------------------------------------------------ */
 $("#improveEssay").addEventListener("click", ()=>{
-  const outputEl = $("#essayOutput");
-  const prompt = `Provide feedback on this essay, including stronger wording, tone improvement, structure tips, and suggestions.
-Essay:
-${$("#essayInput").value}`;
-  ai(prompt, outputEl).then(text=>save("essayData", text));
+  const out = $("#essayOutput");
+  const prompt = `
+Provide feedback to improve this essay's structure, tone, clarity, pacing, and emotional impact:
+${$("#essayInput").value}
+`;
+
+  ai(prompt, out, "essayData");
 });
 
-/* -------------------- RESUME -------------------- */
+$("#downloadEssay").addEventListener("click", ()=>{
+  downloadFile("Essay_Feedback.txt", $("#essayOutput").textContent);
+});
+
+/* -----------------------------------------------------
+   RESUME BUILDER
+------------------------------------------------------ */
 $("#downloadResume").addEventListener("click", ()=>{
-  const text = $("#resumeData").value;
-  save("resumeData", text);
-  const blob = new Blob([text], { type: "text/plain" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "Resume.txt";
-  a.click();
+  downloadFile("Resume.txt", $("#resumeData").value);
 });
 
 $("#resumeHelper").addEventListener("click", ()=>{
-  const outputEl = $("#resumeTips");
-  const prompt = `Provide tips on improving this resume text without rewriting it:
-${$("#resumeData").value}`;
-  ai(prompt, outputEl).then(text=>save("resumeTips", text));
+  const out = $("#resumeTips");
+  const prompt = `
+Provide improvement tips for this resume without rewriting it:
+${$("#resumeData").value}
+`;
+  ai(prompt, out, "resumeTips");
 });
 
-/* -------------------- INTERVIEW -------------------- */
+$("#downloadResumeTips").addEventListener("click", ()=>{
+  downloadFile("Resume_Tips.txt", $("#resumeTips").textContent);
+});
+
+/* -----------------------------------------------------
+   INTERVIEW PRACTICE
+------------------------------------------------------ */
 $("#generateQuestion").addEventListener("click", ()=>{
-  const outputEl = $("#interviewOutput");
-  ai("Ask a realistic college interview question.", outputEl).then(text=>save("interviewPractice", text));
+  const out = $("#interviewOutput");
+  ai("Ask a realistic college interview question.", out, "interviewPractice");
 });
 
 $("#feedbackBtn").addEventListener("click", ()=>{
-  const outputEl = $("#interviewOutput");
-  const prompt = `Provide constructive feedback on this college interview answer:
-${$("#interviewAnswer").value}`;
-  ai(prompt, outputEl).then(text=>save("interviewPractice", text));
+  const out = $("#interviewOutput");
+  const prompt = `
+Give feedback on this college interview answer:
+${$("#interviewAnswer").value}
+`;
+  ai(prompt, out, "interviewPractice");
+});
+
+$("#downloadInterview").addEventListener("click", ()=>{
+  downloadFile("Interview_Practice.txt", $("#interviewOutput").textContent + "\n\nMy answer:\n" + $("#interviewAnswer").value);
 });
