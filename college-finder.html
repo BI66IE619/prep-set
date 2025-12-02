@@ -1,59 +1,87 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>College Finder</title>
   <link rel="stylesheet" href="style.css">
-  <script src="app.js"></script>
 </head>
 <body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo-wrap">
+        <div class="logo"><img src="YOUR_LOGO_URL_HERE" alt="logo"></div>
+      </div>
 
-<div class="sidebar" id="sidebar">
-  <div class="logo-container">
-    <img src="https://files.catbox.moe/whpn5j.png">
+      <nav class="nav">
+        <a href="index.html"><span class="icon">🏠</span><span class="label link-text">Home</span></a>
+        <a href="college-finder.html"><span class="icon">🎓</span><span class="label link-text">College Finder</span></a>
+        <a href="essay.html"><span class="icon">✍️</span><span class="label link-text">Essay Helper</span></a>
+        <a href="interview.html"><span class="icon">🎤</span><span class="label link-text">Interview Prep</span></a>
+        <a href="study-plan.html"><span class="icon">📚</span><span class="label link-text">4-Year Plan</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn ghost" onclick="promptLogo()">Upload Logo</button>
+        <button class="btn ghost" onclick="toggleSidebar()">☰</button>
+        <div class="small-muted">All data saved locally. No accounts required.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <h1 class="h-title">College Finder</h1>
+          <div class="h-sub">Get reach, target, and safety schools tailored to your profile.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Student Profile</h2>
+          <label class="label">GPA</label>
+          <input id="gpa" placeholder="e.g. 3.6" />
+          <label class="label">Intended Major</label>
+          <input id="major" placeholder="e.g. Computer Science" />
+          <label class="label">Interests</label>
+          <input id="interests" placeholder="e.g. cybersecurity, robotics" />
+          <label class="label">Test scores</label>
+          <input id="scores" placeholder="SAT / ACT (optional)" />
+
+          <div class="row">
+            <button class="btn" id="genColleges">Generate</button>
+            <button class="btn outline" onclick="downloadOutput('collegeOutput','college-matches')">Download</button>
+            <button class="btn ghost" id="clearCollegeInputs">Clear</button>
+          </div>
+
+          <div class="hint">Tip: Be specific (major, interests, preferred region) for better matches.</div>
+        </div>
+
+        <div class="card">
+          <h2>Results</h2>
+          <div id="collegeOutput" class="output" data-save="collegeData"></div>
+        </div>
+      </div>
+
+    </main>
   </div>
 
-  <a href="index.html"><span class="icon">🏠</span><span class="link-text">Home</span></a>
-  <a href="college-finder.html"><span class="icon">🎓</span><span class="link-text">College Finder</span></a>
-  <a href="essay.html"><span class="icon">✍️</span><span class="link-text">Essay Help</span></a>
-  <a href="interview.html"><span class="icon">🎤</span><span class="link-text">Interview Prep</span></a>
-  <a href="study-plan.html"><span class="icon">📚</span><span class="link-text">Study Plan</span></a>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", ()=>{
+      // attach button
+      const gen = document.getElementById("genColleges");
+      gen.addEventListener("click", ()=>{
+        const prompt = `You are an admissions counselor. Based on the profile: GPA:${document.getElementById("gpa").value}; Major:${document.getElementById("major").value}; Interests:${document.getElementById("interests").value}; Scores:${document.getElementById("scores").value}. Return 3 reach, 3 target, 3 safety colleges. For each, include: Name; 1-sentence reason; Approx tuition/year USD; City, State; Typical admitted GPA. Format clean lines and headings.`;
+        generateAndRender(prompt, "collegeOutput", "collegeData");
+      });
 
-  <button class="expand-btn" onclick="toggleSidebar()">☰</button>
-</div>
-
-<div class="content">
-  <h1>College Finder</h1>
-
-  <input id="gpa" placeholder="Your GPA">
-  <input id="major" placeholder="Intended Major">
-  <input id="interests" placeholder="Your Interests">
-  <input id="scores" placeholder="SAT / ACT Scores">
-
-  <button onclick="generateColleges()">Generate Colleges</button>
-
-  <div class="output" id="collegeOutput"></div>
-</div>
-
-<script>
-function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("expanded");
-}
-
-async function generateColleges() {
-  const prompt = 
-  `Create a list of 3 reach, 3 target, and 3 safety colleges based on:
-GPA: ${gpa.value}
-Major: ${major.value}
-Interests: ${interests.value}
-Test Scores: ${scores.value}
-Format clean and professional.`;
-
-  document.getElementById("collegeOutput").innerText = "Generating...";
-  const result = await runAI(prompt);
-  document.getElementById("collegeOutput").innerText = result;
-}
-</script>
-
+      document.getElementById("clearCollegeInputs").addEventListener("click", ()=>{
+        ["gpa","major","interests","scores"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; save(id,""); });
+        document.getElementById("collegeOutput").innerHTML="";
+        save("collegeData","");
+      });
+    });
+  </script>
 </body>
 </html>
