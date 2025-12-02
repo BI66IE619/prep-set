@@ -1,56 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Interview Prep</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interview Practice</title>
   <link rel="stylesheet" href="style.css">
-  <script src="app.js"></script>
 </head>
 <body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo-wrap">
+        <div class="logo"><img src="https://files.catbox.moe/whpn5j.png" alt="logo"></div>
+      </div>
 
-<div class="sidebar" id="sidebar">
-  <div class="logo-container">
-    <img src="https://files.catbox.moe/whpn5j.png">
+      <nav class="nav">
+        <a href="index.html"><span class="icon">🏠</span><span class="label link-text">Home</span></a>
+        <a href="college-finder.html"><span class="icon">🎓</span><span class="label link-text">College Finder</span></a>
+        <a href="essay.html"><span class="icon">✍️</span><span class="label link-text">Essay Helper</span></a>
+        <a href="interview.html"><span class="icon">🎤</span><span class="label link-text">Interview Prep</span></a>
+        <a href="study-plan.html"><span class="icon">📚</span><span class="label link-text">4-Year Plan</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn ghost" onclick="promptLogo()">Upload Logo</button>
+        <button class="btn ghost" onclick="toggleSidebar()">☰</button>
+        <div class="small-muted">All data saved locally. No accounts required.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <h1 class="h-title">Interview Practice</h1>
+          <div class="h-sub">Get realistic questions and focused feedback on your answers.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Practice</h2>
+          <div class="row">
+            <button class="btn" id="genQ">Generate Question</button>
+            <button class="btn outline" onclick="downloadOutput('questionBox','interview-question')">Download Q</button>
+          </div>
+
+          <div style="margin-top:12px" class="hint">Use the generated question to practice aloud, then paste your answer below for feedback.</div>
+
+          <div style="margin-top:12px">
+            <div id="questionBox" class="note" data-save="questionData"></div>
+          </div>
+
+          <label class="label" style="margin-top:12px">Your answer</label>
+          <textarea id="interviewAnswer" placeholder="Type or paste your practice answer..."></textarea>
+
+          <div class="row">
+            <button class="btn" id="getFeedback">Get Feedback</button>
+            <button class="btn outline" onclick="downloadOutput('feedbackOutput','interview-feedback')">Download Feedback</button>
+            <button class="btn ghost" id="clearInterview">Clear</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Feedback</h2>
+          <div id="feedbackOutput" class="output" data-save="feedbackData"></div>
+        </div>
+      </div>
+
+    </main>
   </div>
 
-  <a href="index.html"><span class="icon">🏠</span><span class="link-text">Home</span></a>
-  <a href="college-finder.html"><span class="icon">🎓</span><span class="link-text">College Finder</span></a>
-  <a href="essay.html"><span class="icon">✍️</span><span class="link-text">Essay Help</span></a>
-  <a href="interview.html"><span class="icon">🎤</span><span class="link-text">Interview Prep</span></a>
-  <a href="study-plan.html"><span class="icon">📚</span><span class="link-text">Study Plan</span></a>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", ()=>{
+      document.getElementById("genQ").addEventListener("click", ()=>{
+        const prompt = "Generate a realistic college interview question suitable for a high-school senior.";
+        generateAndRender(prompt,"questionBox","questionData");
+      });
 
-  <button class="expand-btn" onclick="toggleSidebar()">☰</button>
-</div>
+      document.getElementById("getFeedback").addEventListener("click", ()=>{
+        const ans = document.getElementById("interviewAnswer").value;
+        const q = document.getElementById("questionBox").innerText || "Interview question";
+        const prompt = `Question: ${q}\nStudent answer: ${ans}\nProvide 3 concise feedback points: strengths, one improvement, how to close stronger.`;
+        generateAndRender(prompt,"feedbackOutput","feedbackData");
+      });
 
-<div class="content">
-  <h1>Interview Practice</h1>
-
-  <button onclick="generateQuestion()">Generate Interview Question</button>
-  <div class="output" id="questionBox"></div>
-
-  <textarea id="interviewAnswer" placeholder="Type your answer..."></textarea>
-  <button onclick="getFeedback()">Get Feedback</button>
-
-  <div class="output" id="feedbackOutput"></div>
-</div>
-
-<script>
-function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("expanded");
-}
-
-async function generateQuestion() {
-  questionBox.innerText = "Generating...";
-  const result = await runAI("Give a realistic college interview question.");
-  questionBox.innerText = result;
-}
-
-async function getFeedback() {
-  feedbackOutput.innerText = "Generating...";
-  const result = await runAI(`Give professional feedback on this answer:\n${interviewAnswer.value}`);
-  feedbackOutput.innerText = result;
-}
-</script>
-
+      document.getElementById("clearInterview").addEventListener("click", ()=>{
+        ["interviewAnswer"].forEach(k=>{ const el=document.getElementById(k); if(el) el.value=""; save(k,""); });
+        document.getElementById("questionBox").innerHTML="";
+        document.getElementById("feedbackOutput").innerHTML="";
+        save("questionData",""); save("feedbackData","");
+      });
+    });
+  </script>
 </body>
 </html>
