@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Study Plan AI</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="logo-container">
+    <img src="https://files.catbox.moe/whpn5j.png">
+  </div>
+
+  <a href="index.html"><span class="icon">🏠</span><span class="link-text">Home</span></a>
+  <a href="college-finder.html"><span class="icon">🎓</span><span class="link-text">College Finder</span></a>
+  <a href="essay.html"><span class="icon">✍️</span><span class="link-text">Essay Help</span></a>
+  <a href="interview.html"><span class="icon">🎤</span><span class="link-text">Interview Prep</span></a>
+  <a href="study-plan.html"><span class="icon">📚</span><span class="link-text">Study Plan</span></a>
+
+  <button class="expand-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="content">
+  <h1>4-Year Study Plan</h1>
+
+  <input id="focus" placeholder="Your Focus (STEM, Pre-med, CS…)">
+  <input id="clubs" placeholder="Clubs You Want to Join">
+  <input id="skills" placeholder="Skills You Want to Build">
+
+  <button onclick="generateStudyPlan()">Generate Plan</button>
+
+  <div class="output" id="planOutput"></div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("expanded");
+}
+
+async function generateStudyPlan() {
+  planOutput.innerText = "Generating...";
+  const result = await runAI(
+    `Create a personalized 4-year academic + extracurricular plan based on:
+Focus: ${focus.value}
+Clubs: ${clubs.value}
+Skills: ${skills.value}`
+  );
+  planOutput.innerText = result;
+}
+</script>
+
+</body>
+</html>
