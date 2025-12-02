@@ -1,0 +1,142 @@
+body {
+  margin: 0;
+  display: flex;
+  font-family: Arial, sans-serif;
+  background: #ffffff;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 80px;
+  background: #0a1a33;
+  color: white;
+  height: 100vh;
+  padding: 20px 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+
+.sidebar.expanded {
+  width: 240px;
+}
+
+/* LOGO */
+.logo-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 25px auto;
+}
+
+.logo-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* SIDEBAR LINKS */
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  color: white;
+  border-radius: 8px;
+  background: #0f2547;
+  gap: 12px;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.sidebar a:hover {
+  background: #12315c;
+}
+
+/* ICONS */
+.icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+
+/* TEXT HIDDEN UNTIL EXPANDED */
+.link-text {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar.expanded .link-text {
+  opacity: 1;
+}
+
+/* EXPAND BUTTON */
+.expand-btn {
+  background: #12315c;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: auto;
+  transition: 0.2s;
+}
+
+.expand-btn:hover {
+  background: #1b3f78;
+}
+
+/* CONTENT AREA */
+.content {
+  flex-grow: 1;
+  padding: 30px;
+  background: #ffffff;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* INPUTS */
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+textarea {
+  height: 150px;
+  resize: vertical;
+}
+
+/* BUTTONS */
+button {
+  background: #0066ff;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #004dcc;
+}
+
+/* OUTPUT BOX */
+.output {
+  background: #ffffff;
+  border: 1px solid #ccc;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  min-height: 100px;
+}
