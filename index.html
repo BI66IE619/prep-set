@@ -6,20 +6,29 @@
   <title>College Prep — AI (Hardcoded Key)</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <div id="app" class="light">
-    <!-- Get Started -->
-    <div id="getStarted" class="modal show">
-      <div class="modal-content card">
+
+    <!-- INTRO / GET STARTED MODAL -->
+    <div id="introModal" class="modal show">
+      <div class="modal-content">
         <h1>College Prep — Local & Anonymous</h1>
+
         <p>
-          This app runs <strong>completely in your browser</strong>. All student inputs are saved locally using <code>localStorage</code>.
-          There is <strong>no backend, no login, and no tracking</strong>.
+          This app runs <strong>100% in your browser</strong> using only 
+          <code>localStorage</code>. Your data never leaves your device.
+          No accounts, no tracking, no server.
         </p>
-        <p class="warning">⚠️ API key is hardcoded in this build. Anyone who views the site source can read it.</p>
-        <div class="modal-actions">
-          <button id="startBtn" class="btn primary">Get Started</button>
-        </div>
+
+        <p class="warning">
+          ⚠️ This version contains a hardcoded API key.  
+          Anyone can view it in the page source.
+        </p>
+
+        <button id="startBtn" class="btn primary">
+          Get Started
+        </button>
       </div>
     </div>
 
