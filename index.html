@@ -1,258 +1,46 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>College Prep — AI (Hardcoded Key)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prep Set - College Preperation AI</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-  <div id="app" class="light">
+<body class="intro-body">
 
-    <!-- INTRO / GET STARTED MODAL -->
-    <div id="introModal" class="modal show">
-      <div class="modal-content">
-        <h1>College Prep — Local & Anonymous</h1>
+  <div class="intro-container">
+    <h1>Prep Set — 100% Local & Anonymous</h1>
 
-        <p>
-          This app runs <strong>100% in your browser</strong> using only 
-          <code>localStorage</code>. Your data never leaves your device.
-          No accounts, no tracking, no server.
-        </p>
+    <p>
+      This tool runs entirely in your browser.  
+      Everything you enter is saved only to <strong>localStorage</strong>.  
+      No accounts, no tracking, no school logins, no servers.
+    </p>
 
-        <p class="warning">
-          ⚠️ This version contains a hardcoded API key.  
-          Anyone can view it in the page source.
-        </p>
+    <p class="small-warning">
+      ⚠️ Everything is ran locally so do remember to keep your college info saved on that device.
+    </p>
 
-        <button id="startBtn" class="btn primary">
-          Get Started
-        </button>
-      </div>
-    </div>
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="brand">CollegePrep • AI</div>
-      <div class="top-actions">
-        <button id="toggleTheme" class="icon-btn" title="Toggle light/dark">🌓</button>
-        <button id="showSettings" class="btn small">Settings</button>
-      </div>
-    </header>
-
-    <main class="container">
-      <aside class="sidebar">
-        <nav>
-          <button class="nav-btn active" data-panel="dashboard">Dashboard</button>
-          <button class="nav-btn" data-panel="collegeMatch">College Match</button>
-          <button class="nav-btn" data-panel="fourYear">4-Year Plan</button>
-          <button class="nav-btn" data-panel="essayHelper">Essay Helper</button>
-          <button class="nav-btn" data-panel="resumeBuilder">Resume Builder</button>
-          <button class="nav-btn" data-panel="interview">Interview Practice</button>
-        </nav>
-
-        <div class="sidebar-foot">
-          <small>All data local • No accounts</small>
-          <button id="clearAll" class="btn danger small">Clear All Data</button>
-        </div>
-      </aside>
-
-      <section class="content">
-        <!-- Dashboard -->
-        <section id="dashboard" class="panel">
-          <h2>Dashboard</h2>
-          <p>Welcome — pick a tool from the left. Data keys saved locally:</p>
-          <pre class="tiny keys">
-collegeMatches
-fourYearPlan
-essayDrafts
-resumeData
-interviewPractice
-uiTheme
-          </pre>
-
-          <div class="grid small">
-            <div class="card">
-              <h3>Quick</h3>
-              <button id="quickMatch" class="btn">Sample Generate</button>
-              <button id="quickPlan" class="btn">Sample Plan</button>
-            </div>
-
-            <div class="card">
-              <h3>Last Outputs</h3>
-              <pre id="lastOutputs" class="tiny">No AI runs yet.</pre>
-            </div>
-          </div>
-        </section>
-
-        <!-- College Match -->
-        <section id="collegeMatch" class="panel hidden">
-          <div class="panel-header">
-            <h2>College Match Generator (AI)</h2>
-            <div class="panel-actions">
-              <button id="saveCollege" class="btn">Save</button>
-              <button id="clearCollege" class="btn small">Clear</button>
-            </div>
-          </div>
-
-          <div class="card form">
-            <label>GPA <input id="gpa" type="number" step="0.01" min="0" max="5" /></label>
-            <label>Interests <input id="interests" type="text" placeholder="e.g., robotics, writing" /></label>
-            <label>Desired Major <input id="major" type="text" placeholder="e.g., Computer Science" /></label>
-            <label>Year in school
-              <select id="yearInSchool"><option>9th</option><option>10th</option><option>11th</option><option>12th</option></select>
-            </label>
-            <label>Test Scores <input id="tests" type="text" placeholder="SAT 1250, ACT 28 (optional)" /></label>
-
-            <div class="row">
-              <button id="generateMatch" class="btn primary">Generate Matches (AI)</button>
-              <button id="generateMatchLocal" class="btn">Generate Local (fallback)</button>
-              <button id="exportMatch" class="btn small">Export JSON</button>
-            </div>
-          </div>
-
-          <div id="matchOutput" class="card output">
-            <h3>Results</h3>
-            <div id="matchList">No results yet.</div>
-          </div>
-        </section>
-
-        <!-- 4-Year Plan -->
-        <section id="fourYear" class="panel hidden">
-          <div class="panel-header">
-            <h2>4-Year Plan Builder (AI)</h2>
-            <div class="panel-actions">
-              <button id="savePlan" class="btn">Save</button>
-              <button id="clearPlan" class="btn small">Clear</button>
-            </div>
-          </div>
-
-          <div class="card form">
-            <label>Current Year <select id="planStartYear"><option>9th</option><option>10th</option><option>11th</option><option>12th</option></select></label>
-            <label>Major / Interest <input id="planMajor" type="text" /></label>
-
-            <div class="row">
-              <button id="generatePlan" class="btn primary">Generate Plan (AI)</button>
-              <button id="generatePlanLocal" class="btn">Generate Local</button>
-            </div>
-          </div>
-
-          <div id="planOutput" class="card output">
-            <h3>Plan</h3>
-            <div id="planList">No plan yet.</div>
-          </div>
-        </section>
-
-        <!-- Essay Helper -->
-        <section id="essayHelper" class="panel hidden">
-          <div class="panel-header">
-            <h2>Essay Helper (AI-assisted)</h2>
-            <div class="panel-actions">
-              <button id="saveEssay" class="btn">Save Draft</button>
-              <button id="clearEssay" class="btn small">Clear</button>
-            </div>
-          </div>
-
-          <div class="card form">
-            <label>Essay title<input id="essayTitle" type="text" /></label>
-            <label>Prompt / Topic<textarea id="essayPrompt" rows="3"></textarea></label>
-            <label>Current Draft<textarea id="essayDraft" rows="6" placeholder="Start ideas here..."></textarea></label>
-
-            <div class="row">
-              <button id="brainstorm" class="btn">Brainstorm (AI)</button>
-              <button id="makeOutline" class="btn">Outline (AI)</button>
-              <button id="improveSuggest" class="btn">Suggestions (AI)</button>
-            </div>
-          </div>
-
-          <div id="essayOutput" class="card output">
-            <h3>Tools Output</h3>
-            <div id="essayResults">No suggestions yet.</div>
-          </div>
-
-          <div class="card">
-            <h3>Saved Drafts</h3>
-            <select id="draftsList" size="4" style="width:100%"></select>
-            <div class="row">
-              <button id="loadDraft" class="btn small">Load</button>
-              <button id="deleteDraft" class="btn small danger">Delete</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Resume Builder -->
-        <section id="resumeBuilder" class="panel hidden">
-          <div class="panel-header">
-            <h2>Resume Builder</h2>
-            <div class="panel-actions">
-              <button id="saveResume" class="btn">Save</button>
-              <button id="clearResume" class="btn small">Clear</button>
-            </div>
-          </div>
-
-          <div class="card form">
-            <label>Full Name (optional)<input id="resName" type="text" placeholder="Leave blank for anonymity" /></label>
-            <label>Activities / Clubs<textarea id="resActivities" rows="3"></textarea></label>
-            <label>Awards<textarea id="resAwards" rows="2"></textarea></label>
-            <label>Skills<textarea id="resSkills" rows="2"></textarea></label>
-            <label>Experience<textarea id="resExperience" rows="4"></textarea></label>
-
-            <div class="row">
-              <button id="exportTxt" class="btn">Download TXT</button>
-              <button id="exportPdf" class="btn">Print / Save as PDF</button>
-            </div>
-          </div>
-
-          <div id="resumeOutput" class="card output">
-            <h3>Resume Preview</h3>
-            <pre id="resumeText">Resume preview will appear here.</pre>
-          </div>
-        </section>
-
-        <!-- Interview -->
-        <section id="interview" class="panel hidden">
-          <div class="panel-header">
-            <h2>Interview Practice Chat</h2>
-            <div class="panel-actions">
-              <button id="saveInterview" class="btn">Save Session</button>
-              <button id="clearInterview" class="btn small">Clear</button>
-            </div>
-          </div>
-
-          <div class="card">
-            <label>Select question category
-              <select id="questionCategory"><option>General</option><option>Behavioral</option><option>Major-specific</option></select>
-            </label>
-            <div class="row">
-              <button id="askQuestionAI" class="btn primary">Ask AI Question</button>
-              <button id="askQuestionLocal" class="btn">Ask Local Question</button>
-            </div>
-
-            <div class="chat" id="interviewChat" aria-live="polite"></div>
-
-            <div class="row">
-              <input id="userAnswer" type="text" placeholder="Type your answer then press Respond" />
-              <button id="sendAnswer" class="btn">Respond</button>
-            </div>
-          </div>
-        </section>
-      </section>
-    </main>
-
-    <!-- Settings panel (collapsed by default) -->
-    <aside id="settingsPanel" class="settings hidden card">
-      <h3>Settings</h3>
-      <p><strong>API KEY</strong> (hardcoded) — visible in source. To change it, edit <code>app.js</code> and update <code>GEMINI_API_KEY</code>.</p>
-      <p><strong>Endpoint:</strong> <code id="endpointDisplay"></code></p>
-      <button id="closeSettings" class="btn">Close</button>
-    </aside>
-
-    <footer class="footer">
-      <small>Made for students • Local-only • v1.1</small>
-    </footer>
+    <button id="startIntro" class="btn primary intro-btn">Get Started</button>
   </div>
 
-  <script src="app.js"></script>
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading-overlay hidden">
+    <div class="loader"></div>
+    <p>Launching your private workspace...</p>
+  </div>
+
+  <script>
+    document.getElementById("startIntro").addEventListener("click", () => {
+      const screen = document.getElementById("loadingScreen");
+      screen.classList.remove("hidden");
+
+      setTimeout(() => {
+        window.location.href = "main.html";
+      }, 2200); // 2.2s loading animation
+    });
+  </script>
+
 </body>
 </html>
