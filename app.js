@@ -79,9 +79,22 @@ $$('.nav-btn').forEach(btn=>{
   });
 });
 
-/* Get started */
-$('#startBtn').addEventListener('click', ()=> {
-  document.getElementById('getStarted').classList.remove('show');
+/* Intro Modal Logic */
+document.addEventListener("DOMContentLoaded", () => {
+    const introModal = document.getElementById("introModal");
+    const startBtn = document.getElementById("startBtn");
+
+    // Ensure modal loads visible
+    introModal.classList.add("show");
+
+    startBtn.addEventListener("click", () => {
+        introModal.classList.remove("show");
+
+        // Smooth fade-out then fully remove
+        setTimeout(() => {
+            introModal.style.display = "none";
+        }, 300);
+    });
 });
 
 /* Settings panel */
