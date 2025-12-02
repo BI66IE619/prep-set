@@ -1,577 +1,196 @@
-/* app.js
-   Client-only College Prep app.
-   - All data saved to localStorage under the keys specified in the UI.
-   - AI calls use OpenAI-compatible API; user must paste their own key.
-   - No keys hardcoded.
-*/
+// ---------- LOCAL STORAGE HELPERS ----------
+function save(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+}
 
-(() => {
-  // ---------- Utility helpers ----------
-  function $(sel, root = document) { return root.querySelector(sel); }
-  function $all(sel, root = document) { return Array.from((root || document).querySelectorAll(sel)); }
-
-  const LS = window.localStorage;
-
-  // Debounce helper
-  function debounce(fn, wait = 400) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), wait);
-    };
-  }
-
-  // Simple storage helpers
-  function saveJSON(key, obj) { LS.setItem(key, JSON.stringify(obj)); }
-  function loadJSON(key, fallback = null) {
-    const v = LS.getItem(key);
-    if (!v) return fallback;
-    try { return JSON.parse(v); } catch (e) { return fallback; }
-  }
-  function removeKey(key){ LS.removeItem(key); }
-
-  // ---------- Theme ----------
-  const themeToggle = $('#themeToggle');
-  function applyTheme() {
-    const t = loadJSON('theme') || 'light';
-    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    else document.documentElement.removeAttribute('data-theme');
-    themeToggle.checked = (t === 'dark');
-  }
-  themeToggle.addEventListener('change', () => {
-    const newTheme = themeToggle.checked ? 'dark' : 'light';
-    saveJSON('theme', newTheme);
-    applyTheme();
-  });
-  applyTheme();
-
-  // ---------- Navigation ----------
-  $all('.nav-link').forEach(btn => {
-    btn.addEventListener('click', () => {
-      $all('.nav-link').forEach(n => n.classList.remove('active'));
-      btn.classList.add('active');
-      const tab = btn.dataset.tab;
-      $all('.tab').forEach(t => t.classList.remove('active'));
-      const target = $('#' + tab);
-      if (target) target.classList.add('active');
-    });
-  });
-
-  // ---------- Storage info (dashboard) ----------
-  function updateStorageInfo(){
-    const size = new Blob(Object.values(LS)).size;
-    $('#storageInfo').textContent = Object.keys(LS).length + ' keys · ~' + size + ' bytes';
-  }
-  updateStorageInfo();
-
-  // Quick notes autosave
-  const quickNotes = $('#quickNotes');
-  quickNotes.value = loadJSON('quickNotes') || '';
-  quickNotes.addEventListener('input', debounce(() => {
-    saveJSON('quickNotes', quickNotes.value);
-    updateStorageInfo();
-  }, 500));
-  
-  // Quick actions
-  $('#quickSaveBtn').addEventListener('click', () => {
-    const snapshot = {};
-    Object.keys(LS).forEach(k => snapshot[k] = LS.getItem(k));
-    const blob = new Blob([JSON.stringify(snapshot, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'collegeprep-localstorage.json'; a.click();
-    URL.revokeObjectURL(url);
-  });
-  $('#quickClearBtn').addEventListener('click', () => {
-    // clears only currently active tab's storage if present
-    const activeTab = $all('.tab').find(t => t.classList.contains('active'));
-    if (!activeTab) return;
-    const id = activeTab.id;
-    const mapping = {
-      collegeMatch: 'collegeMatches',
-      fourYear: 'fourYearPlan',
-      essayHelper: 'essayDrafts',
-      resume: 'resumeData',
-      interview: 'interviewPractice'
-    };
-    const key = mapping[id];
-    if (key) { removeKey(key); alert('Cleared: ' + key); updateStorageInfo(); }
-    else alert('No saved key for this tab.');
-  });
-
-  // Clear all data button
-  $('#clearAllBtn').addEventListener('click', () => {
-    if (confirm('Clear ALL localStorage data for this app? This cannot be undone.')) {
-      // Optionally, only remove keys that belong to this app (prefixless approach)
-      ['collegeMatches','fourYearPlan','essayDrafts','resumeData','interviewPractice','openai_api_key','theme','quickNotes'].forEach(k => removeKey(k));
-      updateStorageInfo();
-      alert('All app data cleared.');
-      location.reload();
+function load(key, fallback = {}) {
+    try {
+        return JSON.parse(localStorage.getItem(key)) || fallback;
+    } catch {
+        return fallback;
     }
-  });
+}
 
-  // Export / import global
-  $('#exportAllDataBtn').addEventListener('click', () => {
-    const snapshot = {};
-    Object.keys(LS).forEach(k => snapshot[k] = LS.getItem(k));
-    const blob = new Blob([JSON.stringify(snapshot, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'collegeprep_all_localstorage.json'; a.click();
-    URL.revokeObjectURL(url);
-  });
-  $('#importAllDataBtn').addEventListener('click', () => {
-    $('#importFileInput').click();
-  });
-  $('#importFileInput').addEventListener('change', (ev) => {
-    const f = ev.target.files?.[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const obj = JSON.parse(reader.result);
-        Object.entries(obj).forEach(([k,v]) => LS.setItem(k, v));
-        alert('Import complete');
-        updateStorageInfo();
-        location.reload();
-      } catch (e) { alert('Invalid file'); }
-    };
-    reader.readAsText(f);
-  });
+// ---------- API KEY ----------
+function saveApiKey() {
+    const key = document.getElementById("apiKeyInput").value;
+    localStorage.setItem("geminiKey", key);
+    alert("API Key saved locally.");
+}
 
-  // ---------- AI helper (calls OpenAI-compatible endpoint) ----------
-  // NOTE: This function will not work offline. It expects an OpenAI API key.
-  // Key retrieval: if user checked "store key" it's saved in localStorage under 'openai_api_key'.
-  // Otherwise, we expect the page to have value in apiKeyInput for current use.
-  function getApiKeyFromUI() {
-    const stored = loadJSON('openai_api_key');
-    if (stored) return stored;
-    const tmp = $('#apiKeyInput') ? $('#apiKeyInput').value.trim() : '';
-    return tmp || null;
-  }
+function getApiKey() {
+    return localStorage.getItem("geminiKey");
+}
 
-  // Optional: allow user to explicitly store key
-  $('#storeKeyCheckbox').addEventListener('change', (e) => {
-    const checked = e.target.checked;
-    if (checked) {
-      const val = $('#apiKeyInput').value.trim();
-      if (!val) return alert('Paste your API key first if you want to store it.');
-      saveJSON('openai_api_key', val);
-      alert('API key stored locally under openai_api_key.');
-    } else {
-      removeKey('openai_api_key');
-      alert('Stored API key removed from localStorage.');
+// ---------- GEMINI API CALL ----------
+async function askGemini(prompt) {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+        alert("Please enter your Gemini API key first.");
+        return;
     }
-  });
 
-  // Generic AI call (Chat Completions style). Returns text or throws.
-  async function callAI(messages = [], model = 'gpt-4o-mini', temperature = 0.7) {
-    const key = getApiKeyFromUI();
-    if (!key) throw new Error('No API key provided. Paste your OpenAI key in Settings / Interview tab.');
-
-    // Minimal fetch to OpenAI Chat Completions endpoint. Adjust model/endpoint as desired.
-    const url = 'https://api.openai.com/v1/chat/completions';
     const body = {
-      model,
-      messages,
-      temperature,
-      max_tokens: 500
+        contents: [{
+            parts: [{ text: prompt }]
+        }]
     };
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + key
-      },
-      body: JSON.stringify(body)
-    });
-    if (!resp.ok) {
-      const txt = await resp.text();
-      throw new Error('API error: ' + resp.status + ' ' + txt);
-    }
-    const data = await resp.json();
-    // Try to extract assistant reply
-    try {
-      return data.choices[0].message.content.trim();
-    } catch (e) {
-      throw new Error('Unexpected API response structure');
-    }
-  }
 
-  // ---------- College Match feature ----------
-  const collegeKey = 'collegeMatches';
-  const gpaInput = $('#gpa');
-  const interestsInput = $('#interests');
-  const majorInput = $('#major');
-  const yearInput = $('#year');
-  const testsInput = $('#tests');
-  const collegeOutput = $('#collegeOutput');
+    const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        }
+    );
 
-  function saveCollegeLocal(obj) { saveJSON(collegeKey, obj); updateStorageInfo(); }
-  function loadCollegeLocal() {
-    return loadJSON(collegeKey, {
-      gpa:'', interests:'', major:'', year:'', tests:'', aiOutput:''
-    });
-  }
+    const data = await response.json();
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+}
 
-  // Load into form
-  function populateCollegeForm() {
-    const cur = loadCollegeLocal();
-    gpaInput.value = cur.gpa || '';
-    interestsInput.value = cur.interests || '';
-    majorInput.value = cur.major || '';
-    yearInput.value = cur.year || '';
-    testsInput.value = cur.tests || '';
-    collegeOutput.textContent = cur.aiOutput || 'No results yet.';
-  }
-  populateCollegeForm();
+// ---------- UI TABS ----------
+function showTab(id) {
+    document.querySelectorAll(".tab").forEach(tab => tab.style.display = "none");
+    document.getElementById(id).style.display = "block";
+}
 
-  // Auto-save on change
-  [$all('#collegeForm input'), $all('#collegeForm textarea')].flat().forEach(inp => {
-    inp.forEach?.(i => i.addEventListener('input', debounce(() => {
-      const cur = loadCollegeLocal();
-      cur.gpa = gpaInput.value;
-      cur.interests = interestsInput.value;
-      cur.major = majorInput.value;
-      cur.year = yearInput.value;
-      cur.tests = testsInput.value;
-      saveCollegeLocal(cur);
-    }, 500)));
-  });
-  // Generate AI (college match)
-  $('#generateMatchBtn').addEventListener('click', async (ev) => {
-    ev.preventDefault();
-    collegeOutput.textContent = 'Thinking... (AI)';
-    const prompt = `You are an admissions-savvy assistant. Given the following student info produce:
-- A short Reach / Target / Safety list (3 items each) with reason (1-2 sentences).
-- Suggested majors and related career paths.
-- A brief note on tuition & location placeholders for each school (label as "placeholder data").
-Return as plain text. Student info:
-GPA: ${gpaInput.value}
-Interests: ${interestsInput.value}
-Desired major: ${majorInput.value}
-Year: ${yearInput.value}
-Test scores: ${testsInput.value}
-Do NOT collect or store any PII. Keep the output concise.`;
-    try {
-      const ai = await callAI([{role:'system',content:'You are concise, helpful, school-appropriate.'},{role:'user',content:prompt}], 'gpt-4o-mini');
-      collegeOutput.textContent = ai;
-      const cur = loadCollegeLocal();
-      cur.aiOutput = ai;
-      cur.gpa = gpaInput.value; cur.interests = interestsInput.value; cur.major = majorInput.value; cur.year = yearInput.value; cur.tests = testsInput.value;
-      saveCollegeLocal(cur);
-    } catch (err) {
-      collegeOutput.textContent = 'AI Error: ' + err.message;
-    }
-  });
+// ---------- LIGHT / DARK MODE ----------
+document.getElementById("toggleMode").onclick = () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+};
 
-  $('#saveCollegeBtn').addEventListener('click', () => {
-    const cur = { gpa:gpaInput.value, interests:interestsInput.value, major:majorInput.value, year:yearInput.value, tests:testsInput.value, aiOutput:collegeOutput.textContent };
-    saveCollegeLocal(cur);
-    alert('College match saved locally.');
-  });
-  $('#clearCollegeBtn').addEventListener('click', () => { removeKey(collegeKey); populateCollegeForm(); alert('College match cleared.'); updateStorageInfo(); });
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+}
 
-  // ---------- 4-Year Plan ----------
-  const planKey = 'fourYearPlan';
-  const planYear = $('#planYear');
-  const planMajor = $('#planMajor');
-  const courseLoad = $('#courseLoad');
-  const planOutput = $('#planOutput');
+// ---------- COLLEGE MATCH ----------
+async function generateMatch() {
+    const data = {
+        gpa: gpa.value,
+        interests: interests.value,
+        major: major.value,
+        gradeLevel: gradeLevel.value,
+        testScores: testScores.value
+    };
 
-  function savePlanLocal(obj) { saveJSON(planKey, obj); updateStorageInfo(); }
-  function loadPlanLocal() { return loadJSON(planKey, {year:'',major:'',courseLoad:'',aiOutput:''}); }
-  function populatePlan() {
-    const p = loadPlanLocal();
-    planYear.value = p.year || '';
-    planMajor.value = p.major || '';
-    courseLoad.value = p.courseLoad || '';
-    planOutput.textContent = p.aiOutput || 'No plan yet.';
-  }
-  populatePlan();
+    save("collegeMatches", data);
 
-  [planYear, planMajor, courseLoad].forEach(i => i.addEventListener('input', debounce(() => {
-    const cur = loadPlanLocal();
-    cur.year = planYear.value; cur.major = planMajor.value; cur.courseLoad = courseLoad.value;
-    savePlanLocal(cur);
-  }, 500)));
+    const prompt = `
+Generate reach/target/safety colleges for:
+GPA: ${data.gpa}
+Interests: ${data.interests}
+Major: ${data.major}
+Grade: ${data.gradeLevel}
+Scores: ${data.testScores}
 
-  $('#generatePlanBtn').addEventListener('click', async (ev) => {
-    ev.preventDefault();
-    planOutput.textContent = 'Thinking... (AI)';
-    const prompt = `Create a high-level 4-year high school plan for a student:
-- Suggest core classes each year, AP/Honors recommendations, extracurriculars, and a timeline for college applications.
-Make the plan tailored for the target major: ${planMajor.value || 'Undecided'}.
-Course load preference: ${courseLoad.value || 'Balanced'}.
-Student current year: ${planYear.value || 'Freshman'}.
-Keep output concise and numbered by year.`;
-    try {
-      const ai = await callAI([{role:'system',content:'You are a helpful school counselor assistant.'},{role:'user',content:prompt}], 'gpt-4o-mini', 0.6);
-      planOutput.textContent = ai;
-      const cur = loadPlanLocal();
-      cur.aiOutput = ai;
-      cur.year = planYear.value; cur.major = planMajor.value; cur.courseLoad = courseLoad.value;
-      savePlanLocal(cur);
-    } catch (err) { planOutput.textContent = 'AI Error: ' + err.message; }
-  });
+Include short explanations and estimated tuition/location (placeholders allowed).
+    `;
 
-  $('#savePlanBtn').addEventListener('click', () => {
-    const cur = { year:planYear.value, major:planMajor.value, courseLoad:courseLoad.value, aiOutput:planOutput.textContent };
-    savePlanLocal(cur); alert('4-Year Plan saved locally.');
-  });
-  $('#clearPlanBtn').addEventListener('click', () => { removeKey(planKey); populatePlan(); updateStorageInfo(); alert('Cleared 4-Year Plan'); });
+    matchOutput.textContent = "Loading...";
+    matchOutput.textContent = await askGemini(prompt);
+}
 
-  // ---------- Essay Helper ----------
-  const essayKey = 'essayDrafts';
-  const essayPrompt = $('#essayPrompt');
-  const essayDraft = $('#essayDraft');
-  const essayOutput = $('#essayOutput');
-  const essayDraftSelect = $('#essayDraftSelect');
+function clearMatch() {
+    localStorage.removeItem("collegeMatches");
+    matchOutput.textContent = "";
+}
 
-  function saveEssayLocal(obj) {
-    // obj: {id, title, prompt, draft, output, createdAt}
-    const list = loadJSON(essayKey) || [];
-    // if id exists, replace
-    const idx = list.findIndex(x => x.id === obj.id);
-    if (idx >= 0) list[idx] = obj; else list.push(obj);
-    saveJSON(essayKey, list); updateStorageInfo();
-    refreshEssayList();
-  }
-  function loadEssayLocal(id) {
-    const list = loadJSON(essayKey) || [];
-    return list.find(x => x.id === id);
-  }
-  function refreshEssayList() {
-    const list = loadJSON(essayKey) || [];
-    essayDraftSelect.innerHTML = '';
-    list.forEach(it => {
-      const opt = document.createElement('option');
-      opt.value = it.id; opt.textContent = new Date(it.createdAt).toLocaleString() + ' — ' + (it.title || it.prompt?.slice(0,30) || 'Draft');
-      essayDraftSelect.appendChild(opt);
-    });
-  }
-  refreshEssayList();
+// ---------- 4 YEAR PLAN ----------
+async function generatePlan() {
+    const text = document.getElementById("planInput").value;
+    save("fourYearPlan", { text });
 
-  $('#brainstormBtn').addEventListener('click', async () => {
-    essayOutput.textContent = 'Thinking... (AI brainstorm)';
-    const prompt = `Brainstorm short, creative idea bullets (6-10) to help write an essay on this prompt: ${essayPrompt.value}
-Do NOT write a full essay. Keep each idea 1-2 short sentences.`;
-    try {
-      const ai = await callAI([{role:'system',content:'You are a creative brainstorming assistant for student essays.'},{role:'user',content:prompt}], 'gpt-4o-mini', 0.9);
-      essayOutput.textContent = ai;
-    } catch (err) { essayOutput.textContent = 'AI Error: ' + err.message; }
-  });
+    planOutput.textContent = "Loading...";
+    planOutput.textContent = await askGemini(`
+Create a 4-year high school plan with courses, AP/honors, clubs, and application timeline for this student:
+${text}
+    `);
+}
 
-  $('#outlineBtn').addEventListener('click', async () => {
-    essayOutput.textContent = 'Thinking... (AI outline)';
-    const prompt = `Create a concise outline (intro, 3 body points, conclusion) for the essay prompt: ${essayPrompt.value}. Use the student's draft if provided: ${essayDraft.value || '[no draft]'}.
-Do not write the essay — only outline headings and short 1-sentence notes.`;
-    try {
-      const ai = await callAI([{role:'system',content:'You are an outline helper.'},{role:'user',content:prompt}], 'gpt-4o-mini', 0.6);
-      essayOutput.textContent = ai;
-    } catch (err) { essayOutput.textContent = 'AI Error: ' + err.message; }
-  });
+function clearPlan() {
+    localStorage.removeItem("fourYearPlan");
+    planOutput.textContent = "";
+}
 
-  $('#improveBtn').addEventListener('click', async () => {
-    essayOutput.textContent = 'Thinking... (AI suggestions)';
-    const prompt = `Provide improvement suggestions for this short student draft (no rewriting): ${essayDraft.value || '[no draft]'}.
-Focus on structure, clarity, transitions, and ways to make examples stronger. Keep suggestions concise and numbered.`;
-    try {
-      const ai = await callAI([{role:'system',content:'You are a constructive essay coach.'},{role:'user',content:prompt}], 'gpt-4o-mini',0.7);
-      essayOutput.textContent = ai;
-    } catch (err) { essayOutput.textContent = 'AI Error: ' + err.message; }
-  });
+// ---------- ESSAY HELPER ----------
+async function improveEssay() {
+    const text = essayText.value;
+    save("essayDrafts", { text });
 
-  $('#saveEssayBtn').addEventListener('click', () => {
-    const id = 'e_' + Date.now();
-    const item = { id, title: (essayPrompt.value || '').slice(0,60), prompt: essayPrompt.value, draft: essayDraft.value, output: essayOutput.textContent, createdAt: Date.now() };
-    saveEssayLocal(item);
-    alert('Essay saved locally.');
-  });
+    essayOutput.textContent = "Loading...";
+    essayOutput.textContent = await askGemini(`
+Improve this essay. DO NOT rewrite it. Suggest structure, clarity, and ideas:
+${text}
+    `);
+}
 
-  $('#loadDraftBtn').addEventListener('click', () => {
-    const id = essayDraftSelect.value;
-    if (!id) return alert('Select a draft');
-    const it = loadEssayLocal(id);
-    if (!it) return alert('Not found');
-    essayPrompt.value = it.prompt || '';
-    essayDraft.value = it.draft || '';
-    essayOutput.textContent = it.output || '';
-  });
-  $('#deleteDraftBtn').addEventListener('click', () => {
-    const id = essayDraftSelect.value;
-    if (!id) return alert('Select a draft');
-    let list = loadJSON(essayKey) || [];
-    list = list.filter(x => x.id !== id);
-    saveJSON(essayKey, list);
-    refreshEssayList();
-    alert('Deleted');
-  });
-  $('#clearEssayBtn').addEventListener('click', () => { removeKey(essayKey); refreshEssayList(); essayPrompt.value=''; essayDraft.value=''; essayOutput.textContent=''; updateStorageInfo(); });
+function clearEssay() {
+    localStorage.removeItem("essayDrafts");
+    essayOutput.textContent = "";
+}
 
-  // ---------- Resume Builder ----------
-  const resumeKey = 'resumeData';
-  const resName = $('#resName'), resObjective = $('#resObjective'), resActivities = $('#resActivities'), resAwards = $('#resAwards'), resSkills = $('#resSkills'), resExperience = $('#resExperience');
+// ---------- RESUME ----------
+function saveResume() {
+    const data = {
+        activities: activities.value,
+        awards: awards.value,
+        skills: skills.value,
+        experience: experience.value
+    };
+    save("resumeData", data);
+    alert("Resume saved locally.");
+}
 
-  function saveResumeLocal(obj) { saveJSON(resumeKey, obj); updateStorageInfo(); }
-  function loadResumeLocal() {
-    return loadJSON(resumeKey, {name:'',objective:'',activities:'',awards:'',skills:'',experience:''});
-  }
-  function populateResume() {
-    const r = loadResumeLocal();
-    resName.value = r.name || ''; resObjective.value = r.objective || ''; resActivities.value = r.activities || ''; resAwards.value = r.awards || ''; resSkills.value = r.skills || ''; resExperience.value = r.experience || '';
-  }
-  populateResume();
+function exportResume() {
+    const text = `
+Activities:
+${activities.value}
 
-  $('#saveResumeBtn').addEventListener('click', () => {
-    const obj = { name:resName.value, objective:resObjective.value, activities:resActivities.value, awards:resAwards.value, skills:resSkills.value, experience:resExperience.value };
-    saveResumeLocal(obj);
-    alert('Resume saved locally.');
-  });
+Awards:
+${awards.value}
 
-  function buildResumeText(obj) {
-    const lines = [];
-    if (obj.name) lines.push(obj.name);
-    if (obj.objective) lines.push('', 'Objective: ' + obj.objective);
-    if (obj.skills) lines.push('', 'Skills:', ...obj.skills.split(',').map(s=>'- ' + s.trim()));
-    if (obj.activities) lines.push('', 'Activities:', ...obj.activities.split(',').map(s=>'- ' + s.trim()));
-    if (obj.awards) lines.push('', 'Awards:', ...obj.awards.split(',').map(s=>'- ' + s.trim()));
-    if (obj.experience) lines.push('', 'Experience:', obj.experience);
-    return lines.join('\n');
-  }
+Skills:
+${skills.value}
 
-  $('#generateResumeTxt').addEventListener('click', () => {
-    const obj = { name:resName.value, objective:resObjective.value, activities:resActivities.value, awards:resAwards.value, skills:resSkills.value, experience:resExperience.value };
-    const txt = buildResumeText(obj);
-    const blob = new Blob([txt], {type:'text/plain'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = (obj.name || 'resume') + '.txt'; a.click(); URL.revokeObjectURL(url);
-  });
+Experience:
+${experience.value}
+`;
 
-  $('#generateResumePdf').addEventListener('click', () => {
-    const obj = { name:resName.value, objective:resObjective.value, activities:resActivities.value, awards:resAwards.value, skills:resSkills.value, experience:resExperience.value };
-    const txt = buildResumeText(obj);
-    // Using jsPDF from CDN loaded in index.html
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const lines = doc.splitTextToSize(txt, 180);
-    doc.setFontSize(12);
-    doc.text(lines, 15, 20);
-    doc.save((obj.name || 'resume') + '.pdf');
-  });
+    const blob = new Blob([text], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "resume.txt";
+    link.click();
+}
 
-  $('#clearResumeBtn').addEventListener('click', () => { removeKey(resumeKey); populateResume(); updateStorageInfo(); alert('Resume cleared'); });
+function clearResume() {
+    localStorage.removeItem("resumeData");
+}
 
-  // ---------- Interview Practice Chat ----------
-  const interviewKey = 'interviewPractice';
-  const chatWindow = $('#chatWindow');
-  const chatInput = $('#chatInput');
-  const interviewRole = $('#interviewRole');
+// ---------- INTERVIEW PRACTICE ----------
+async function startInterview() {
+    interviewOutput.textContent = await askGemini(`
+Ask a single interview question for a high school student applying to college.
+    `);
+}
 
-  // Load persisted session (if any)
-  function loadInterviewLocal() {
-    return loadJSON(interviewKey) || { messages: [], createdAt: Date.now() };
-  }
-  function saveInterviewLocal(obj) { saveJSON(interviewKey, obj); updateStorageInfo(); }
+async function sendInterviewResponse() {
+    const response = interviewResponse.value;
+    const feedback = await askGemini(`
+Student answer: "${response}"
+Give constructive, positive feedback only. One paragraph.
+    `);
 
-  function renderChat() {
-    const sess = loadInterviewLocal();
-    chatWindow.innerHTML = '';
-    (sess.messages || []).forEach(m => {
-      const div = document.createElement('div');
-      div.className = 'chat-msg ' + (m.sender === 'ai' ? 'ai' : 'user');
-      div.textContent = m.text;
-      chatWindow.appendChild(div);
-    });
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  }
-  renderChat();
+    interviewOutput.textContent += "\n\nFeedback:\n" + feedback;
 
-  async function aiAskNextQuestion() {
-    // AI asks next question based on role
-    const role = interviewRole.value || 'College admissions interviewer';
-    const prompt = `You are an interviewer for: ${role}. Ask a clear, open-ended interview question aimed at a high school student applying to college. Keep it concise.`;
-    try {
-      const q = await callAI([{role:'system',content:'You are a friendly interview question generator.'},{role:'user',content:prompt}], 'gpt-4o-mini', 0.8);
-      const sess = loadInterviewLocal();
-      sess.messages.push({ sender:'ai', text:q, time:Date.now() });
-      saveInterviewLocal(sess);
-      renderChat();
-    } catch (err) {
-      const sess = loadInterviewLocal();
-      sess.messages.push({ sender:'ai', text: 'AI error: ' + err.message, time:Date.now() });
-      saveInterviewLocal(sess);
-      renderChat();
-    }
-  }
+    let history = load("interviewPractice", []);
+    history.push({ question: interviewOutput.textContent, response });
+    save("interviewPractice", history);
+}
 
-  $('#startInterviewBtn').addEventListener('click', async () => {
-    // start new session
-    const confirmReset = confirm('Start a new interview session? This will append; you can clear if you want fresh.');
-    if (confirmReset) {
-      saveInterviewLocal({ messages: [], createdAt: Date.now() });
-      renderChat();
-    }
-    await aiAskNextQuestion();
-  });
-
-  // When user sends an answer, we ask AI to give feedback.
-  async function sendUserAnswer() {
-    const text = chatInput.value.trim();
-    if (!text) return;
-    // Append user message to local
-    const sess = loadInterviewLocal();
-    sess.messages.push({ sender:'user', text, time:Date.now() });
-    saveInterviewLocal(sess);
-    renderChat();
-    chatInput.value = '';
-
-    // AI feedback prompt
-    const role = interviewRole.value || 'College admissions interviewer';
-    const prompt = `You are an admissions interviewer for ${role}. The student answered this: "${text}"
-Provide concise feedback (3 brief points): what was strong, what to improve, and a short tip on delivery/tone. Keep it constructive and school-appropriate.`;
-    try {
-      const fb = await callAI([{role:'system',content:'You are a constructive mock interview coach.'},{role:'user',content:prompt}], 'gpt-4o-mini', 0.7);
-      const sess2 = loadInterviewLocal();
-      sess2.messages.push({ sender:'ai', text:fb, time:Date.now() });
-      saveInterviewLocal(sess2);
-      renderChat();
-    } catch (err) {
-      const sess2 = loadInterviewLocal();
-      sess2.messages.push({ sender:'ai', text:'AI Error: ' + err.message, time:Date.now() });
-      saveInterviewLocal(sess2);
-      renderChat();
-    }
-  }
-
-  $('#sendChatBtn').addEventListener('click', sendUserAnswer);
-  chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendUserAnswer(); });
-
-  $('#saveInterviewBtn').addEventListener('click', () => {
-    const sess = loadInterviewLocal();
-    saveInterviewLocal(sess);
-    alert('Session saved locally.');
-  });
-  $('#clearInterviewBtn').addEventListener('click', () => { if (confirm('Clear interview session?')) { removeKey(interviewKey); renderChat(); updateStorageInfo(); } });
-
-  // ---------- Initial population and autosaves ----------
-  // College & plan populate already called. Resume populate called. renderChat called.
-  updateStorageInfo();
-
-  // Autosave resume inputs on change
-  [resName, resObjective, resActivities, resAwards, resSkills, resExperience].forEach(inp => {
-    inp.addEventListener('input', debounce(() => {
-      const obj = { name:resName.value, objective:resObjective.value, activities:resActivities.value, awards:resAwards.value, skills:resSkills.value, experience:resExperience.value };
-      saveResumeLocal(obj);
-    }, 500));
-  });
-
-  // Keep storage info updated periodically
-  setInterval(updateStorageInfo, 3000);
-
-  // Expose for debugging (optional)
-  window.__CollegePrep = {
-    loadJSON, saveJSON, removeKey, callAI
-  };
-
-})();
+function clearInterview() {
+    localStorage.removeItem("interviewPractice");
+    interviewOutput.textContent = "";
+}
