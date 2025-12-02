@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prep Set</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div id="app" class="light">
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <h2>Dashboard</h2>
+      <button class="nav-btn active" data-panel="collegePanel">College Match</button>
+      <button class="nav-btn" data-panel="planPanel">4-Year Plan</button>
+      <button class="nav-btn" data-panel="essayPanel">Essay Helper</button>
+      <button class="nav-btn" data-panel="resumePanel">Resume Builder</button>
+      <button class="nav-btn" data-panel="interviewPanel">Interview Practice</button>
+      <button id="toggleTheme" class="nav-btn">Toggle Mode</button>
+    </nav>
+
+    <!-- Content -->
+    <main id="content">
+
+      <!-- College Match Panel -->
+      <section id="collegePanel" class="panel">
+        <h1>College Match Generator</h1>
+        <label>GPA</label>
+        <input id="gpa" type="text">
+
+        <label>Interests</label>
+        <input id="interests" type="text">
+
+        <label>Intended Major</label>
+        <input id="major" type="text">
+
+        <label>Year in School</label>
+        <input id="year" type="text">
+
+        <label>Test Scores</label>
+        <input id="scores" type="text">
+
+        <button id="generateCollege" class="btn primary">Generate Matches</button>
+        <pre id="collegeOutput" class="output-box"></pre>
+      </section>
+
+      <!-- 4-Year Plan Panel -->
+      <section id="planPanel" class="panel hidden">
+        <h1>4-Year Plan Builder</h1>
+        <button id="generatePlan" class="btn primary">Generate Plan</button>
+        <pre id="planOutput" class="output-box"></pre>
+      </section>
+
+      <!-- Essay Helper -->
+      <section id="essayPanel" class="panel hidden">
+        <h1>Essay Helper</h1>
+        <textarea id="essayInput" placeholder="Paste your draft or ideas..."></textarea>
+        <button id="improveEssay" class="btn primary">Improve Essay</button>
+        <pre id="essayOutput" class="output-box"></pre>
+      </section>
+
+      <!-- Resume Builder -->
+      <section id="resumePanel" class="panel hidden">
+        <h1>Resume Builder</h1>
+        <textarea id="resumeData" placeholder="List activities, skills, awards..."></textarea>
+        <button id="downloadResume" class="btn primary">Download TXT</button>
+      </section>
+
+      <!-- Interview Practice -->
+      <section id="interviewPanel" class="panel hidden">
+        <h1>Interview Practice</h1>
+        <button id="generateQuestion" class="btn primary">Ask Question</button>
+        <textarea id="interviewAnswer" placeholder="Your response..."></textarea>
+        <button id="feedbackBtn" class="btn">Get Feedback</button>
+        <pre id="interviewOutput" class="output-box"></pre>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
