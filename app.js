@@ -1,8 +1,8 @@
 /* =====================
    CONFIG
 ===================== */
-const KEY = "AIzaSyBkF5COOLyXeFGAHFfi8UAGZIQWq0SiEpA";
-const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+const GEMINI_API_KEY = "AIzaSyBkF5COOLyXeFGAHFfi8UAGZIQWq0SiEpA";
+const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 /* =====================
    HELPERS
@@ -49,21 +49,39 @@ $$(".nav-btn").forEach(btn => {
 });
 
 /* =====================
-   AI REQUEST
+   AI CALL USING GEMINI FLASH
 ===================== */
 async function ai(prompt) {
   const body = {
-    contents: [{ role: "user", parts: [{ text: prompt }] }]
+    contents: [
+      {
+        parts: [{ text: prompt }]
+      }
+    ]
   };
 
-  const res = await fetch(`${ENDPOINT}?key=${KEY}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  try {
+    const resp = await fetch(GEMINI_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY
+      },
+      body: JSON.stringify(body)
+    });
 
-  const data = await res.json();
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    if (!resp.ok) {
+      console.error("Gemini Flash API error:", resp.status, await resp.text());
+      return `AI request failed: ${resp.status}`;
+    }
+
+    const data = await resp.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    return text || "No response from Gemini Flash.";
+  } catch (err) {
+    console.error("Fetch error:", err);
+    return "AI request failed: network error.";
+  }
 }
 
 /* =====================
@@ -77,7 +95,7 @@ $("#generateCollege").addEventListener("click", async () => {
   const scores = $("#scores").value;
 
   const prompt = `
-Generate REALISTIC college reach/target/safety matches based on:
+Generate realistic college reach, target, and safety matches based on:
 
 GPA: ${gpa}
 Interests: ${interests}
@@ -87,7 +105,7 @@ Test Scores: ${scores}
 
 Include:
 - 3 reach, 3 target, 3 safety schools
-- 1 sentence per school why it's a match
+- 1 sentence per school explaining why it matches
 - Tuition estimate placeholder
 - Location
 `;
@@ -121,11 +139,11 @@ $("#improveEssay").addEventListener("click", async () => {
   const text = $("#essayInput").value;
 
   const prompt = `
-Improve this essay WITHOUT rewriting it. Give:
+Improve this essay WITHOUT rewriting it. Provide:
 - Stronger wording suggestions
 - Tone improvements
 - Structure tips
-- What to add/remove
+- What to add or remove
 
 Essay:
 ${text}
@@ -155,15 +173,17 @@ $("#downloadResume").addEventListener("click", () => {
    INTERVIEW PRACTICE
 ===================== */
 $("#generateQuestion").addEventListener("click", async () => {
-  $("#interviewOutput").textContent = await ai("Ask a realistic college interview question.");
+  const out = await ai("Ask a realistic college interview question.");
+  $("#interviewOutput").textContent = out;
 });
 
 $("#feedbackBtn").addEventListener("click", async () => {
   const ans = $("#interviewAnswer").value;
   const prompt = `
-Give constructive feedback on this interview answer:
+Provide constructive feedback on this college interview answer:
 
 ${ans}
 `;
-  $("#interviewOutput").textContent = await ai(prompt);
+  const out = await ai(prompt);
+  $("#interviewOutput").textContent = out;
 });
