@@ -1,238 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prep Set - AI College Preparation</title>
-  <link rel="stylesheet" href="styles.css" />
-  <!-- jsPDF for PDF export (client-only) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Prep Set - College Preperation AI</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="app" class="app">
-    <header class="topbar">
-      <div class="brand">Prepset</div>
-      <div class="top-actions">
-        <label class="theme-toggle">
-          <input id="themeToggle" type="checkbox" />
-          <span>Dark</span>
-        </label>
-        <button id="clearAllBtn" class="btn small danger">Clear All Data</button>
-      </div>
-    </header>
 
-    <main class="container">
-      <aside class="sidebar">
-        <nav>
-          <button class="nav-link active" data-tab="dashboard">Dashboard</button>
-          <button class="nav-link" data-tab="collegeMatch">College Match</button>
-          <button class="nav-link" data-tab="fourYear">4-Year Plan</button>
-          <button class="nav-link" data-tab="essayHelper">Essay Helper</button>
-          <button class="nav-link" data-tab="resume">Resume Builder</button>
-          <button class="nav-link" data-tab="interview">Interview Practice</button>
-          <button class="nav-link" data-tab="settings">Settings</button>
-        </nav>
-      </aside>
+<header>
+    <h1>Prep Board</h1>
+    <button id="toggleMode">🌙 / ☀️</button>
+</header>
 
-      <section class="content">
-        <!-- Dashboard -->
-        <section id="dashboard" class="tab active">
-          <h1>Welcome</h1>
-          <p>Privacy-first college prep tools. Everything is stored locally in your browser's <code>localStorage</code>.</p>
-          <div class="cards">
-            <div class="card">
-              <h3>Quick Actions</h3>
-              <button id="quickSaveBtn" class="btn">Save Snapshot</button>
-              <button id="quickClearBtn" class="btn outline">Clear Current Tab Data</button>
-            </div>
-            <div class="card">
-              <h3>Storage Usage</h3>
-              <div id="storageInfo">Calculating...</div>
-            </div>
-            <div class="card">
-              <h3>Notes</h3>
-              <textarea id="quickNotes" placeholder="Private notes saved locally..."></textarea>
-            </div>
-          </div>
-        </section>
+<section id="apiKeySection">
+    <h2>Gemini API Key</h2>
+    <input id="apiKeyInput" type="password" placeholder="Paste your Gemini API key (stored locally)">
+    <button onclick="saveApiKey()">Save</button>
+</section>
 
-        <!-- College Match -->
-        <section id="collegeMatch" class="tab">
-          <h1>College Match Generator (AI)</h1>
-          <div class="panel">
-            <form id="collegeForm" class="form">
-              <div class="row">
-                <label>GPA <input id="gpa" type="number" step="0.01" min="0" max="5" /></label>
-                <label>Year <input id="year" type="text" placeholder="e.g., Junior" /></label>
-              </div>
-              <div class="row">
-                <label>Interests <input id="interests" type="text" placeholder="clubs, topics" /></label>
-                <label>Desired major <input id="major" type="text" placeholder="e.g., Computer Science" /></label>
-              </div>
-              <div class="row">
-                <label>Test scores (optional) <input id="tests" type="text" placeholder="SAT: 1400, ACT: 30" /></label>
-              </div>
-              <div class="row">
-                <button id="generateMatchBtn" class="btn">Generate Match (AI)</button>
-                <button id="saveCollegeBtn" class="btn outline" type="button">Save Locally</button>
-                <button id="clearCollegeBtn" class="btn danger outline" type="button">Clear</button>
-              </div>
-            </form>
+<nav>
+    <button onclick="showTab('match')">College Match</button>
+    <button onclick="showTab('plan')">4-Year Plan</button>
+    <button onclick="showTab('essay')">Essay Helper</button>
+    <button onclick="showTab('resume')">Resume Builder</button>
+    <button onclick="showTab('interview')">Interview Practice</button>
+</nav>
 
-            <div class="ai-output">
-              <h3>AI Output</h3>
-              <div id="collegeOutput" class="output">No results yet.</div>
-              <small class="muted">Placeholder tuition/location data used.</small>
-            </div>
-          </div>
-        </section>
+<!-- COLLEGE MATCH -->
+<div class="tab" id="match">
+    <h2>College Match Generator</h2>
 
-        <!-- 4-Year Plan -->
-        <section id="fourYear" class="tab">
-          <h1>4-Year Plan Builder (AI)</h1>
-          <div class="panel">
-            <form id="planForm" class="form">
-              <div class="row">
-                <label>Current Year <input id="planYear" type="text" placeholder="e.g., Sophomore" /></label>
-                <label>Target Major <input id="planMajor" type="text" placeholder="e.g., Engineering" /></label>
-              </div>
-              <div class="row">
-                <label>Preferred course load <input id="courseLoad" type="text" placeholder="Balanced / Heavy / Light" /></label>
-              </div>
-              <div class="row">
-                <button id="generatePlanBtn" class="btn">Generate 4-Year Plan (AI)</button>
-                <button id="savePlanBtn" class="btn outline" type="button">Save Locally</button>
-                <button id="clearPlanBtn" class="btn danger outline" type="button">Clear</button>
-              </div>
-            </form>
+    <input id="gpa" placeholder="GPA">
+    <input id="interests" placeholder="Interests">
+    <input id="major" placeholder="Desired Major">
+    <input id="gradeLevel" placeholder="Year in School">
+    <input id="testScores" placeholder="Test Scores">
 
-            <div class="ai-output">
-              <h3>Suggested 4-Year Plan</h3>
-              <div id="planOutput" class="output">No plan yet.</div>
-            </div>
-          </div>
-        </section>
+    <button onclick="generateMatch()">Generate Matches (Gemini)</button>
+    <button onclick="clearMatch()">Clear</button>
 
-        <!-- Essay Helper -->
-        <section id="essayHelper" class="tab">
-          <h1>Essay Helper (School-safe)</h1>
-          <div class="panel">
-            <div class="row">
-              <label>Prompt / Topic
-                <textarea id="essayPrompt" placeholder="Paste essay prompt or idea..."></textarea>
-              </label>
-              <label>Draft (you can paste a short draft)
-                <textarea id="essayDraft" placeholder="Paste a short draft here. We will NOT auto-complete whole essays."></textarea>
-              </label>
-            </div>
+    <pre id="matchOutput"></pre>
+</div>
 
-            <div class="row">
-              <button id="brainstormBtn" class="btn">Brainstorm Ideas (AI)</button>
-              <button id="outlineBtn" class="btn">Create Outline (AI)</button>
-              <button id="improveBtn" class="btn">Improvement Suggestions (AI)</button>
-              <button id="saveEssayBtn" class="btn outline" type="button">Save Locally</button>
-              <button id="clearEssayBtn" class="btn danger outline" type="button">Clear</button>
-            </div>
+<!-- 4 YEAR PLAN -->
+<div class="tab" id="plan">
+    <h2>4-Year Plan Builder</h2>
 
-            <div class="ai-output">
-              <h3>Essay Helper Output</h3>
-              <div id="essayOutput" class="output">No suggestions yet.</div>
-            </div>
+    <textarea id="planInput" placeholder="Describe your goals"></textarea>
+    <button onclick="generatePlan()">Generate Plan (Gemini)</button>
+    <button onclick="clearPlan()">Clear</button>
 
-            <div>
-              <h4>Saved Drafts</h4>
-              <select id="essayDraftSelect"></select>
-              <button id="loadDraftBtn" class="btn outline">Load</button>
-              <button id="deleteDraftBtn" class="btn danger outline">Delete</button>
-            </div>
-          </div>
-        </section>
+    <pre id="planOutput"></pre>
+</div>
 
-        <!-- Resume Builder -->
-        <section id="resume" class="tab">
-          <h1>Resume Builder</h1>
-          <div class="panel">
-            <form id="resumeForm" class="form">
-              <label>Full Name (optional) <input id="resName" type="text" placeholder="Leave blank to stay anonymous" /></label>
-              <label>Objective <textarea id="resObjective" placeholder="One-sentence objective"></textarea></label>
-              <label>Activities (comma-separated) <input id="resActivities" type="text" /></label>
-              <label>Awards (comma-separated) <input id="resAwards" type="text" /></label>
-              <label>Skills (comma-separated) <input id="resSkills" type="text" /></label>
-              <label>Experience / Notes <textarea id="resExperience"></textarea></label>
+<!-- ESSAY HELPER -->
+<div class="tab" id="essay">
+    <h2>Essay Helper</h2>
 
-              <div class="row">
-                <button id="generateResumeTxt" class="btn" type="button">Download TXT</button>
-                <button id="generateResumePdf" class="btn" type="button">Download PDF</button>
-                <button id="saveResumeBtn" class="btn outline" type="button">Save Locally</button>
-                <button id="clearResumeBtn" class="btn danger outline" type="button">Clear</button>
-              </div>
-            </form>
-          </div>
-        </section>
+    <textarea id="essayText" placeholder="Write or brainstorm here..."></textarea>
+    <button onclick="improveEssay()">Improve (Gemini)</button>
+    <button onclick="clearEssay()">Clear</button>
 
-        <!-- Interview Practice -->
-        <section id="interview" class="tab">
-          <h1>Interview Practice Chat (AI)</h1>
-          <div class="panel interview">
-            <div class="controls">
-              <label>Role / Job <input id="interviewRole" placeholder="e.g., College Admissions Interview" /></label>
-              <label>Store API Key? <input id="storeKeyCheckbox" type="checkbox" /></label>
-              <label>Paste OpenAI API Key (optional; not stored unless checked)
-                <input id="apiKeyInput" type="password" placeholder="sk-..." />
-              </label>
-              <button id="startInterviewBtn" class="btn">Start Session (AI)</button>
-              <button id="saveInterviewBtn" class="btn outline">Save Session</button>
-              <button id="clearInterviewBtn" class="btn danger outline">Clear Session</button>
-            </div>
+    <pre id="essayOutput"></pre>
+</div>
 
-            <div class="chat">
-              <div id="chatWindow" class="chat-window"></div>
-              <div class="chat-input">
-                <input id="chatInput" placeholder="Type your answer and press Enter..." />
-                <button id="sendChatBtn" class="btn">Send</button>
-              </div>
-            </div>
-          </div>
-        </section>
+<!-- RESUME BUILDER -->
+<div class="tab" id="resume">
+    <h2>Resume Builder</h2>
 
-        <!-- Settings -->
-        <section id="settings" class="tab">
-          <h1>Settings & Instructions</h1>
-          <div class="panel">
-            <h3>How to add your OpenAI API key (optional)</h3>
-            <ol>
-              <li>Open the <strong>Interview Practice</strong> tab (or others) and paste your OpenAI key into the "Paste OpenAI API Key" field when you want to use AI features.</li>
-              <li>If you check "Store API Key?" the key will be saved in your browser's <code>localStorage</code> under the key <code>openai_api_key</code>. Only enable that if you accept that the key sits on your device.</li>
-              <li>If you do NOT check "Store API Key?" the key is used for the current session only and not saved to localStorage (it remains in the page's memory until reload).</li>
-            </ol>
+    <textarea id="activities" placeholder="Activities"></textarea>
+    <textarea id="awards" placeholder="Awards"></textarea>
+    <textarea id="skills" placeholder="Skills"></textarea>
+    <textarea id="experience" placeholder="Experience"></textarea>
 
-            <h3>How to host on GitHub Pages</h3>
-            <ol>
-              <li>Create a new GitHub repo and push these three files to the root: <code>index.html</code>, <code>styles.css</code>, <code>app.js</code>.</li>
-              <li>In the repository settings, enable GitHub Pages and set source to <code>main branch / root</code>. The site will be available at <code>https://&lt;your-username&gt;.github.io/&lt;repo-name&gt;/</code>.</li>
-              <li>Because this app is 100% client-side it will run from GitHub Pages with no server required.</li>
-            </ol>
+    <button onclick="saveResume()">Save Resume</button>
+    <button onclick="exportResume()">Export TXT</button>
+    <button onclick="clearResume()">Clear</button>
+</div>
 
-            <h3>Anonymity checklist</h3>
-            <ul>
-              <li>Do not paste personal info you don't want stored — everything you type is stored locally.</li>
-              <li>Don't store API key if you want maximum safety (don't check "Store API Key?").</li>
-              <li>Use Private/Incognito mode if you want to remove stored data easily on browser close (but remember localStorage persists across sessions unless cleared).</li>
-            </ul>
+<!-- INTERVIEW PRACTICE -->
+<div class="tab" id="interview">
+    <h2>Interview Practice</h2>
 
-            <div class="row">
-              <button id="exportAllDataBtn" class="btn">Export All localStorage (download)</button>
-              <button id="importAllDataBtn" class="btn outline">Import localStorage JSON</button>
-              <input id="importFileInput" type="file" accept="application/json" style="display:none" />
-            </div>
-          </div>
-        </section>
-      </section>
-    </main>
+    <button onclick="startInterview()">Start / Next Question (Gemini)</button>
+    <input id="interviewResponse" placeholder="Your answer">
+    <button onclick="sendInterviewResponse()">Send Response</button>
+    <button onclick="clearInterview()">Clear</button>
 
-    <footer class="footer muted">Made for classrooms — runs fully client-side. No tracking.</footer>
-  </div>
+    <pre id="interviewOutput"></pre>
+</div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
