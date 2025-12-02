@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>College Finder</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="logo-container">
+    <img src="https://files.catbox.moe/whpn5j.png">
+  </div>
+
+  <a href="index.html"><span class="icon">🏠</span><span class="link-text">Home</span></a>
+  <a href="college-finder.html"><span class="icon">🎓</span><span class="link-text">College Finder</span></a>
+  <a href="essay.html"><span class="icon">✍️</span><span class="link-text">Essay Help</span></a>
+  <a href="interview.html"><span class="icon">🎤</span><span class="link-text">Interview Prep</span></a>
+  <a href="study-plan.html"><span class="icon">📚</span><span class="link-text">Study Plan</span></a>
+
+  <button class="expand-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="content">
+  <h1>College Finder</h1>
+
+  <input id="gpa" placeholder="Your GPA">
+  <input id="major" placeholder="Intended Major">
+  <input id="interests" placeholder="Your Interests">
+  <input id="scores" placeholder="SAT / ACT Scores">
+
+  <button onclick="generateColleges()">Generate Colleges</button>
+
+  <div class="output" id="collegeOutput"></div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("expanded");
+}
+
+async function generateColleges() {
+  const prompt = 
+  `Create a list of 3 reach, 3 target, and 3 safety colleges based on:
+GPA: ${gpa.value}
+Major: ${major.value}
+Interests: ${interests.value}
+Test Scores: ${scores.value}
+Format clean and professional.`;
+
+  document.getElementById("collegeOutput").innerText = "Generating...";
+  const result = await runAI(prompt);
+  document.getElementById("collegeOutput").innerText = result;
+}
+</script>
+
+</body>
+</html>
