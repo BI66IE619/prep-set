@@ -3,122 +3,157 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>College Prep AI</title>
+  <title>CollegePrep — Professional</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="app" class="light">
+  <div id="app" class="layout light">
+    <aside class="sidebar">
+      <div class="brand">CollegePrep</div>
+      <nav class="nav">
+        <button class="nav-item active" data-panel="panel-college">College Match</button>
+        <button class="nav-item" data-panel="panel-plan">4-Year Plan</button>
+        <button class="nav-item" data-panel="panel-essay">Essay Helper</button>
+        <button class="nav-item" data-panel="panel-resume">Resume Builder</button>
+        <button class="nav-item" data-panel="panel-interview">Interview Practice</button>
+      </nav>
 
-    <!-- Top Navigation -->
-    <header class="topbar">
-      <h1>College Prep — AI Toolkit</h1>
-      <button id="toggleTheme" class="theme-btn">🌙</button>
-    </header>
+      <div class="sidebar-footer">
+        <button id="themeToggle" class="btn-ghost">Toggle theme</button>
+        <button id="clearAll" class="btn-danger">Clear all</button>
+        <div class="small muted">All data stored locally in your browser.</div>
+      </div>
+    </aside>
 
-    <!-- Side Navigation -->
-    <nav class="sidebar">
-      <button class="nav-btn active" data-panel="collegePanel">College Matches</button>
-      <button class="nav-btn" data-panel="planPanel">4-Year Plan</button>
-      <button class="nav-btn" data-panel="essayPanel">Essay Helper</button>
-      <button class="nav-btn" data-panel="resumePanel">Resume Builder</button>
-      <button class="nav-btn" data-panel="interviewPanel">Interview Prep</button>
-    </nav>
+    <main class="main">
+      <header class="topbar">
+        <h1 class="title">CollegePrep — AI Toolkit</h1>
+        <div class="top-actions">
+          <button id="docsBtn" class="btn-ghost">How this works</button>
+        </div>
+      </header>
 
-    <!-- Panels Container -->
-    <main class="content">
+      <section id="panel-college" class="panel active">
+        <div class="panel-grid">
+          <div class="card">
+            <h2 class="card-title">College Match</h2>
+            <label>GPA<input id="gpa" type="text" placeholder="e.g. 3.6"></label>
+            <label>Interests<input id="interests" type="text" placeholder="e.g. robotics, volunteering"></label>
+            <label>Desired major<input id="major" type="text" placeholder="e.g. Computer Science"></label>
+            <label>Year<input id="year" type="text" placeholder="e.g. 11th"></label>
+            <label>Test scores<input id="scores" type="text" placeholder="optional"></label>
 
-      <!-- COLLEGE MATCHES -->
-      <section id="collegePanel" class="panel">
-        <h2>College Matches</h2>
+            <div class="row">
+              <button id="genCollege" class="btn">Generate</button>
+              <button id="downloadCollege" class="btn-outline">Download</button>
+              <button id="clearCollege" class="btn-ghost">Clear</button>
+            </div>
+          </div>
 
-        <label>GPA</label>
-        <input id="gpa" />
-
-        <label>Interests</label>
-        <input id="interests" />
-
-        <label>Major</label>
-        <input id="major" />
-
-        <label>Graduation Year</label>
-        <input id="year" />
-
-        <label>SAT/ACT Scores</label>
-        <input id="scores" />
-
-        <button id="generateCollege" class="btn primary">Generate</button>
-        <button id="downloadCollege" class="btn">Download Response</button>
-
-        <h3>AI Response</h3>
-        <pre id="collegeOutput" class="outputBox"></pre>
+          <div class="card output-card">
+            <h3 class="card-title">AI Result</h3>
+            <div id="collegeOutput" class="output"></div>
+          </div>
+        </div>
       </section>
 
-      <!-- 4-YEAR PLAN -->
-      <section id="planPanel" class="panel hidden">
-        <h2>4-Year High School Plan</h2>
+      <section id="panel-plan" class="panel">
+        <div class="panel-grid">
+          <div class="card">
+            <h2 class="card-title">4-Year Plan Builder</h2>
 
-        <label>Main Focus</label>
-        <input id="planFocus" />
+            <label>Focus / Goal<input id="planFocus" placeholder="e.g. Prepare for CS major"></label>
+            <label>Clubs & Activities<input id="planClubs" placeholder="e.g. robotics, debate"></label>
+            <label>Skills to develop<input id="planSkills" placeholder="e.g. programming, public speaking"></label>
 
-        <label>Clubs</label>
-        <input id="planClubs" />
+            <div class="row">
+              <button id="genPlan" class="btn">Generate</button>
+              <button id="downloadPlan" class="btn-outline">Download</button>
+              <button id="clearPlan" class="btn-ghost">Clear</button>
+            </div>
+          </div>
 
-        <label>Skills You Want</label>
-        <input id="planSkills" />
-
-        <button id="generatePlan" class="btn primary">Generate</button>
-        <button id="downloadPlan" class="btn">Download Response</button>
-
-        <h3>Your Customizable Plan</h3>
-        <pre id="planOutput" class="outputBox"></pre>
+          <div class="card output-card">
+            <h3 class="card-title">AI Result</h3>
+            <div id="planOutput" class="output"></div>
+          </div>
+        </div>
       </section>
 
-      <!-- ESSAY HELPER -->
-      <section id="essayPanel" class="panel hidden">
-        <h2>Essay Helper</h2>
+      <section id="panel-essay" class="panel">
+        <div class="panel-grid">
+          <div class="card">
+            <h2 class="card-title">Essay Helper</h2>
+            <label>Essay Prompt / Topic<textarea id="essayPrompt" rows="3" placeholder="Paste the prompt or topic"></textarea></label>
+            <label>Your Draft<textarea id="essayDraft" rows="6" placeholder="Your draft or ideas"></textarea></label>
 
-        <label>Your Essay</label>
-        <textarea id="essayInput" rows="7"></textarea>
+            <div class="row">
+              <button id="brainstorm" class="btn">Brainstorm</button>
+              <button id="outline" class="btn">Outline</button>
+              <button id="improveEssay" class="btn">Suggestions</button>
+              <button id="downloadEssay" class="btn-outline">Download</button>
+            </div>
+            <button id="clearEssay" class="btn-ghost small">Clear drafts</button>
+          </div>
 
-        <button id="improveEssay" class="btn primary">Improve Essay</button>
-        <button id="downloadEssay" class="btn">Download Response</button>
-
-        <h3>AI Suggestions</h3>
-        <pre id="essayOutput" class="outputBox"></pre>
+          <div class="card output-card">
+            <h3 class="card-title">AI Output</h3>
+            <div id="essayOutput" class="output"></div>
+          </div>
+        </div>
       </section>
 
-      <!-- RESUME BUILDER -->
-      <section id="resumePanel" class="panel hidden">
-        <h2>Resume Builder</h2>
+      <section id="panel-resume" class="panel">
+        <div class="panel-grid">
+          <div class="card">
+            <h2 class="card-title">Resume Builder</h2>
+            <label>Your resume text<textarea id="resumeText" rows="6" placeholder="List activities, skills, awards, experience"></textarea></label>
 
-        <label>Your Resume Text</label>
-        <textarea id="resumeData" rows="7"></textarea>
+            <div class="row">
+              <button id="resumeTipsBtn" class="btn">Get AI Tips</button>
+              <button id="downloadResume" class="btn-outline">Download Resume</button>
+              <button id="downloadResumeTips" class="btn-outline">Download Tips</button>
+            </div>
+            <button id="clearResume" class="btn-ghost small">Clear</button>
+          </div>
 
-        <button id="resumeHelper" class="btn secondary">AI Tips</button>
-        <button id="downloadResume" class="btn">Download Resume</button>
-        <button id="downloadResumeTips" class="btn">Download AI Tips</button>
-
-        <h3>AI Resume Tips</h3>
-        <pre id="resumeTips" class="outputBox"></pre>
+          <div class="card output-card">
+            <h3 class="card-title">AI Tips</h3>
+            <div id="resumeTips" class="output"></div>
+          </div>
+        </div>
       </section>
 
-      <!-- INTERVIEW PRACTICE -->
-      <section id="interviewPanel" class="panel hidden">
-        <h2>Interview Practice</h2>
+      <section id="panel-interview" class="panel">
+        <div class="panel-grid">
+          <div class="card">
+            <h2 class="card-title">Interview Practice</h2>
+            <div class="row">
+              <button id="genQuestionBtn" class="btn">Generate Question</button>
+              <button id="downloadQuestion" class="btn-outline">Download Q</button>
+            </div>
 
-        <button id="generateQuestion" class="btn primary">Generate Question</button>
-        <button id="downloadInterviewQ" class="btn">Download Question</button>
+            <label>Your answer<textarea id="interviewAnswerInput" rows="5" placeholder="Type your answer"></textarea></label>
+            <div class="row">
+              <button id="getFeedbackBtn" class="btn">Get Feedback</button>
+              <button id="downloadFeedback" class="btn-outline">Download Feedback</button>
+              <button id="clearInterview" class="btn-ghost small">Clear</button>
+            </div>
+          </div>
 
-        <pre id="interviewOutput" class="outputBox"></pre>
-
-        <label>Your Answer</label>
-        <textarea id="interviewAnswer" rows="5"></textarea>
-
-        <button id="feedbackBtn" class="btn secondary">Get Feedback</button>
-        <button id="downloadInterviewFeedback" class="btn">Download Feedback</button>
+          <div class="card output-card">
+            <h3 class="card-title">AI Chat</h3>
+            <div id="interviewOutput" class="output"></div>
+          </div>
+        </div>
       </section>
 
     </main>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="loader"></div>
+    <div class="loading-text">Generating…</div>
   </div>
 
   <script src="app.js"></script>
