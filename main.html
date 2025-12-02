@@ -1,79 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>College Prep Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>College Prep AI</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div id="app" class="light">
+  <div id="app" class="light">
 
-  <header>
-    <h1>College Prep Dashboard</h1>
-    <button id="toggleTheme" class="btn secondary">Toggle Theme</button>
-  </header>
+    <!-- Top Navigation -->
+    <header class="topbar">
+      <h1>College Prep — AI Toolkit</h1>
+      <button id="toggleTheme" class="theme-btn">🌙</button>
+    </header>
 
-  <nav>
-    <button class="nav-btn active" data-panel="collegePanel">College Match</button>
-    <button class="nav-btn" data-panel="planPanel">4-Year Plan</button>
-    <button class="nav-btn" data-panel="essayPanel">Essay Helper</button>
-    <button class="nav-btn" data-panel="resumePanel">Resume Builder</button>
-    <button class="nav-btn" data-panel="interviewPanel">Interview Practice</button>
-  </nav>
+    <!-- Side Navigation -->
+    <nav class="sidebar">
+      <button class="nav-btn active" data-panel="collegePanel">College Matches</button>
+      <button class="nav-btn" data-panel="planPanel">4-Year Plan</button>
+      <button class="nav-btn" data-panel="essayPanel">Essay Helper</button>
+      <button class="nav-btn" data-panel="resumePanel">Resume Builder</button>
+      <button class="nav-btn" data-panel="interviewPanel">Interview Prep</button>
+    </nav>
 
-  <main>
-    <!-- College Match -->
-    <section id="collegePanel" class="panel">
-      <h2>College Match Generator</h2>
-      <input id="gpa" placeholder="GPA">
-      <input id="interests" placeholder="Interests">
-      <input id="major" placeholder="Desired Major">
-      <input id="year" placeholder="Year in School">
-      <input id="scores" placeholder="Test Scores">
-      <button id="generateCollege" class="btn primary">Generate Colleges</button>
-      <div id="collegeOutput" class="output"></div>
-    </section>
+    <!-- Panels Container -->
+    <main class="content">
 
-    <!-- 4-Year Plan -->
-    <section id="planPanel" class="panel hidden">
-      <h2>4-Year Plan Builder</h2>
-      <input id="planFocus" placeholder="Focus / Goal">
-      <input id="planClubs" placeholder="Clubs / Extracurriculars">
-      <input id="planSkills" placeholder="Skills / Strengths">
-      <button id="generatePlan" class="btn primary">Generate 4-Year Plan</button>
-      <div id="planOutput" class="output"></div>
-    </section>
+      <!-- COLLEGE MATCHES -->
+      <section id="collegePanel" class="panel">
+        <h2>College Matches</h2>
 
-    <!-- Essay Helper -->
-    <section id="essayPanel" class="panel hidden">
-      <h2>Essay Helper</h2>
-      <textarea id="essayInput" placeholder="Paste your essay here..."></textarea>
-      <button id="improveEssay" class="btn primary">Get Suggestions</button>
-      <div id="essayOutput" class="output"></div>
-    </section>
+        <label>GPA</label>
+        <input id="gpa" />
 
-    <!-- Resume Builder -->
-    <section id="resumePanel" class="panel hidden">
-      <h2>Resume Builder</h2>
-      <textarea id="resumeData" placeholder="Add your experience, skills, and activities..."></textarea>
-      <button id="downloadResume" class="btn primary">Download Resume</button>
-      <button id="resumeHelper" class="btn secondary">Get Tips</button>
-      <div id="resumeTips" class="output"></div>
-    </section>
+        <label>Interests</label>
+        <input id="interests" />
 
-    <!-- Interview Practice -->
-    <section id="interviewPanel" class="panel hidden">
-      <h2>Interview Practice</h2>
-      <button id="generateQuestion" class="btn primary">Ask Question</button>
-      <div id="interviewOutput" class="output"></div>
-      <textarea id="interviewAnswer" placeholder="Your answer..."></textarea>
-      <button id="feedbackBtn" class="btn secondary">Get Feedback</button>
-    </section>
-  </main>
+        <label>Major</label>
+        <input id="major" />
 
-</div>
+        <label>Graduation Year</label>
+        <input id="year" />
 
-<script src="app.js"></script>
+        <label>SAT/ACT Scores</label>
+        <input id="scores" />
+
+        <button id="generateCollege" class="btn primary">Generate</button>
+        <button id="downloadCollege" class="btn">Download Response</button>
+
+        <h3>AI Response</h3>
+        <pre id="collegeOutput" class="outputBox"></pre>
+      </section>
+
+      <!-- 4-YEAR PLAN -->
+      <section id="planPanel" class="panel hidden">
+        <h2>4-Year High School Plan</h2>
+
+        <label>Main Focus</label>
+        <input id="planFocus" />
+
+        <label>Clubs</label>
+        <input id="planClubs" />
+
+        <label>Skills You Want</label>
+        <input id="planSkills" />
+
+        <button id="generatePlan" class="btn primary">Generate</button>
+        <button id="downloadPlan" class="btn">Download Response</button>
+
+        <h3>Your Customizable Plan</h3>
+        <pre id="planOutput" class="outputBox"></pre>
+      </section>
+
+      <!-- ESSAY HELPER -->
+      <section id="essayPanel" class="panel hidden">
+        <h2>Essay Helper</h2>
+
+        <label>Your Essay</label>
+        <textarea id="essayInput" rows="7"></textarea>
+
+        <button id="improveEssay" class="btn primary">Improve Essay</button>
+        <button id="downloadEssay" class="btn">Download Response</button>
+
+        <h3>AI Suggestions</h3>
+        <pre id="essayOutput" class="outputBox"></pre>
+      </section>
+
+      <!-- RESUME BUILDER -->
+      <section id="resumePanel" class="panel hidden">
+        <h2>Resume Builder</h2>
+
+        <label>Your Resume Text</label>
+        <textarea id="resumeData" rows="7"></textarea>
+
+        <button id="resumeHelper" class="btn secondary">AI Tips</button>
+        <button id="downloadResume" class="btn">Download Resume</button>
+        <button id="downloadResumeTips" class="btn">Download AI Tips</button>
+
+        <h3>AI Resume Tips</h3>
+        <pre id="resumeTips" class="outputBox"></pre>
+      </section>
+
+      <!-- INTERVIEW PRACTICE -->
+      <section id="interviewPanel" class="panel hidden">
+        <h2>Interview Practice</h2>
+
+        <button id="generateQuestion" class="btn primary">Generate Question</button>
+        <button id="downloadInterviewQ" class="btn">Download Question</button>
+
+        <pre id="interviewOutput" class="outputBox"></pre>
+
+        <label>Your Answer</label>
+        <textarea id="interviewAnswer" rows="5"></textarea>
+
+        <button id="feedbackBtn" class="btn secondary">Get Feedback</button>
+        <button id="downloadInterviewFeedback" class="btn">Download Feedback</button>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
