@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interview Prep</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="logo-container">
+    <img src="https://files.catbox.moe/whpn5j.png">
+  </div>
+
+  <a href="index.html"><span class="icon">🏠</span><span class="link-text">Home</span></a>
+  <a href="college-finder.html"><span class="icon">🎓</span><span class="link-text">College Finder</span></a>
+  <a href="essay.html"><span class="icon">✍️</span><span class="link-text">Essay Help</span></a>
+  <a href="interview.html"><span class="icon">🎤</span><span class="link-text">Interview Prep</span></a>
+  <a href="study-plan.html"><span class="icon">📚</span><span class="link-text">Study Plan</span></a>
+
+  <button class="expand-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="content">
+  <h1>Interview Practice</h1>
+
+  <button onclick="generateQuestion()">Generate Interview Question</button>
+  <div class="output" id="questionBox"></div>
+
+  <textarea id="interviewAnswer" placeholder="Type your answer..."></textarea>
+  <button onclick="getFeedback()">Get Feedback</button>
+
+  <div class="output" id="feedbackOutput"></div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("expanded");
+}
+
+async function generateQuestion() {
+  questionBox.innerText = "Generating...";
+  const result = await runAI("Give a realistic college interview question.");
+  questionBox.innerText = result;
+}
+
+async function getFeedback() {
+  feedbackOutput.innerText = "Generating...";
+  const result = await runAI(`Give professional feedback on this answer:\n${interviewAnswer.value}`);
+  feedbackOutput.innerText = result;
+}
+</script>
+
+</body>
+</html>
