@@ -1,4 +1,4 @@
-const GEMINI_API_KEY = "AIzaSyBkF5COOLyXeFGAHFfi8UAGZIQWq0SiEpA";
+const GEMINI_API_KEY = "AIzaSyAA19DMd4hcfRsTnCo6Cj2Q4iTUlSPEu6I";
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 const $ = selector => document.querySelector(selector);
