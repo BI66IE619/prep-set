@@ -4,7 +4,7 @@
    ============================================================
 */
 
-const GEMINI_API_KEY = "YOUR_API_KEY_HERE"; 
+const GEMINI_API_KEY = "AIzaSyAA19DMd4hcfRsTnCo6Cj2Q4iTUlSPEu6I"; 
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 // Shortcuts
