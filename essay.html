@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Essay Helper</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="logo-container">
+    <img src="https://files.catbox.moe/whpn5j.png">
+  </div>
+
+  <a href="index.html"><span class="icon">🏠</span><span class="link-text">Home</span></a>
+  <a href="college-finder.html"><span class="icon">🎓</span><span class="link-text">College Finder</span></a>
+  <a href="essay.html"><span class="icon">✍️</span><span class="link-text">Essay Help</span></a>
+  <a href="interview.html"><span class="icon">🎤</span><span class="link-text">Interview Prep</span></a>
+  <a href="study-plan.html"><span class="icon">📚</span><span class="link-text">Study Plan</span></a>
+
+  <button class="expand-btn" onclick="toggleSidebar()">☰</button>
+</div>
+
+<div class="content">
+  <h1>Essay Helper</h1>
+
+  <textarea id="essayInput" placeholder="Paste your essay here..."></textarea>
+  <button onclick="improveEssay()">Improve Essay</button>
+
+  <div class="output" id="essayOutput"></div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("expanded");
+}
+
+async function improveEssay() {
+  document.getElementById("essayOutput").innerText = "Generating...";
+  const result = await runAI(`Improve this essay professionally:\n${essayInput.value}`);
+  document.getElementById("essayOutput").innerText = result;
+}
+</script>
+
+</body>
+</html>
