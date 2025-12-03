@@ -1,65 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting Started</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo-section">
-            <img id="logo-img" src="https://via.placeholder.com/80" alt="Logo">
-        </div>
-        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<body class="landing-body">
+
+  <div class="landing-container">
+
+    <!-- HERO SECTION -->
+    <section class="landing-hero">
+      <h1>Welcome to Your AI Productivity Dashboard</h1>
+      <p class="landing-desc">
+        This app is your all-in-one creative toolkit — powered by AI and designed 
+        to help you write, generate ideas, organize tasks, create documents, and 
+        build projects with clarity and speed. Whether you're a student, developer, 
+        or creator, this dashboard helps you turn your imagination into instant results.
+      </p>
+    </section>
+
+    <!-- OVERLAPPING CIRCLE IMAGES -->
+    <section class="landing-images">
+      <div class="circle-img circle-left"></div>
+      <div class="circle-img circle-right"></div>
+    </section>
+
+    <!-- ABOUT ME SECTION -->
+    <section class="landing-about">
+      <h2>About Me</h2>
+      <p>
+        Hi, I’m a young developer who has been passionate about coding since I first 
+        discovered how websites and programs work behind the scenes. I started by 
+        experimenting with simple HTML pages, then dove deeper into JavaScript, UI design, 
+        app building, AI tools, and backend systems. Over time, I learned how powerful 
+        technology can be when you use it creatively.
+      </p>
+      <p>
+        What inspires me most is being able to take an idea and turn it into something real — 
+        something people can use. I love solving problems, designing interfaces, building 
+        tools that help others, and learning new things every day. This project is a reflection 
+        of how far I’ve come and how excited I am to keep growing as a developer.
+      </p>
+    </section>
+
+    <!-- BUTTON TO ENTER DASHBOARD -->
+    <div class="landing-btn-wrap">
+      <a href="main.html" class="landing-btn">Enter Dashboard</a>
     </div>
 
-    <!-- Main Container -->
-    <div class="content-container">
+  </div>
 
-        <section class="intro-section">
-            <h1>Welcome to Your AI Productivity Hub</h1>
-            <p class="intro-description">
-                This platform is designed to be your all-in-one AI toolkit — combining automated writing,
-                school utilities, creativity boosters, and smart tools into one seamless dashboard.
-                Every generator, page, and feature is crafted to help you work faster, stay organized,
-                and create higher-quality results using the power of AI.
-            </p>
-        </section>
-
-        <!-- Overlapping Circles -->
-        <div class="circle-container">
-            <div class="circle left-circle"></div>
-            <div class="circle right-circle"></div>
-        </div>
-
-        <!-- About Me Section -->
-        <section class="about-section">
-            <h2>About Me</h2>
-            <p>
-                Hi, I’m the creator of this platform — a dedicated student and self-taught developer who
-                started coding out of curiosity and a passion for building things that make life easier.
-                Over the years, I’ve experimented with web development, game engines, UI/UX design, and AI tools,
-                shaping all of that experience into this project.
-            </p>
-            <p>
-                What inspired me most was realizing how powerful simple tools can be when they’re designed
-                with real problems in mind. Whether it was helping friends with schoolwork, automating
-                boring tasks, or experimenting with creative ideas, coding became a way for me to turn
-                ideas into functional projects.
-            </p>
-            <p>
-                This dashboard is the result of that journey — a clean, modern, and powerful workspace that
-                reflects everything I’ve learned and everything I enjoy building.
-            </p>
-
-            <a class="start-btn" href="main.html">Enter Dashboard</a>
-        </section>
-
-    </div>
-
-    <script src="app.js"></script>
 </body>
 </html>
