@@ -1,6 +1,12 @@
 /* ==========================================================
    UNIVERSAL APP.JS — SERVERLESS (NO API KEY EXPOSED)
-   + GPA tracker + Semester Mode + Bookmark + improvements
+   - Sidebar + logo
+   - Local save/load helpers (robust)
+   - AI call via POST /api/generate
+   - Markdown-like renderer
+   - GPA history + semester mode + autosave helpers
+   - Download + bookmark helpers
+   - Exposes useful functions to window for inline onclick
 =========================================================== */
 
 /* -----------------------------
@@ -10,16 +16,22 @@ const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 
 function save(key, value){
-  try { localStorage.setItem(key, typeof value === "string" ? value : JSON.stringify(value)); }
-  catch(e){ console.warn("Storage save failed", e); }
+  try {
+    const v = (typeof value === "string") ? value : JSON.stringify(value);
+    localStorage.setItem(key, v);
+  } catch(e) {
+    console.warn("Storage save failed", e);
+  }
 }
+
 function load(key, fallback = null){
   try {
     const raw = localStorage.getItem(key);
     if(raw === null || raw === undefined) return fallback;
-    // if fallback is not string, assume JSON
-    if(typeof fallback !== "string" && raw.startsWith("{") || raw.startsWith("[")) {
-      return JSON.parse(raw);
+
+    // If fallback is non-string, assume JSON stored
+    if(typeof fallback !== "string"){
+      try { return JSON.parse(raw); } catch(e){ return raw; }
     }
     return raw;
   } catch(e){
@@ -45,7 +57,12 @@ function applySavedSidebar(){
 }
 
 function setLogo(url){
-  const img = $("#logo-img");
+  if(!url) return;
+  // prefer element id logo-img, fallback to .logo img
+  let img = $("#logo-img");
+  if(!img){
+    img = document.querySelector(".logo img");
+  }
   if(!img) return;
   img.src = url;
   save("logoURL", url);
@@ -53,7 +70,7 @@ function setLogo(url){
 
 /* ==========================================================
    RESTORE INPUTS & OUTPUTS
-   - data-save on inputs/textarea stores value
+   - data-save on inputs/textarea/select stores value
    - data-save-output on outputs stores innerHTML
 =========================================================== */
 
@@ -79,6 +96,7 @@ function restoreOutputs(){
 /* ==========================================================
    MARKDOWN-LIKE → HTML RENDERER (safe-ish)
 =========================================================== */
+
 function escapeHtml(s){
   return String(s || "").replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 }
@@ -87,11 +105,12 @@ function renderStyled(md){
   if(!md) return "";
   md = md.replace(/\r\n/g,"\n");
 
+  // headings
   md = md.replace(/^### (.*)$/gm, "<h3>$1</h3>");
   md = md.replace(/^## (.*)$/gm, "<h2>$1</h2>");
   md = md.replace(/^# (.*)$/gm,  "<h1>$1</h1>");
 
-  // bold and italic (simple)
+  // inline bold/italic (simple)
   md = md.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
   md = md.replace(/\*(.*?)\*/g, "<em>$1</em>");
 
@@ -131,7 +150,6 @@ function renderStyled(md){
       continue;
     }
 
-    // paragraph
     if(inUl){ out += "</ul>"; inUl = false; }
     if(inOl){ out += "</ol>"; inOl = false; }
     out += `<p>${escapeHtml(line)}</p>`;
@@ -144,6 +162,8 @@ function renderStyled(md){
 
 /* ==========================================================
    AI / BACKEND CALL
+   Expects a server endpoint POST /api/generate that returns JSON.
+   Successful response shape: { text: "...", candidates: ... } or legacy shapes.
 =========================================================== */
 
 async function callAI(promptText){
@@ -171,7 +191,7 @@ function showLoading(el){
 /* ==========================================================
    GENERATE & RENDER (backwards-compatible + onComplete callback)
    generateAndRender(promptBuilder, outputId, storageKey, onComplete)
-   - onComplete(text, html) optional
+   - onComplete(text, html, raw) optional
 =========================================================== */
 
 async function generateAndRender(promptBuilder, outputId, storageKey, onComplete){
@@ -189,7 +209,7 @@ async function generateAndRender(promptBuilder, outputId, storageKey, onComplete
     return;
   }
 
-  // primary text: support both { text } and older response shapes
+  // pick text from common shapes
   const text = (res.text) ? String(res.text) : (res?.candidates?.[0]?.content?.parts?.[0]?.text || "");
   const html = renderStyled(text);
 
@@ -241,14 +261,13 @@ function bookmarkPage(){
     }
   } catch(e){ /* ignore */ }
 
-  // modern browsers — show instruction
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
   alert(`To bookmark this page: press ${isMac ? "⌘ Cmd" : "Ctrl"} + D`);
 }
 
 /* ==========================================================
    GPA HISTORY + SEMESTER MODE
-   - semesterData stored under "semesterData"
+   - semesterData stored under SEM_KEY
    - structure:
      {
        semesterCount: 2|3,
@@ -260,7 +279,6 @@ function bookmarkPage(){
 
 const SEM_KEY = "semesterData";
 
-// default generator
 function defaultSemesterData(){
   return {
     semesterCount: 2,
@@ -271,7 +289,7 @@ function defaultSemesterData(){
 
 function loadSemesterData(){
   const raw = load(SEM_KEY);
-  if(!raw) {
+  if(!raw){
     const def = defaultSemesterData();
     save(SEM_KEY, def);
     return def;
@@ -296,20 +314,17 @@ function renderSemesterControls(){
   const currentEl = $("#currentSemester");
   if(countEl){
     countEl.value = data.semesterCount;
-    // ensure change handler exists
     countEl.onchange = () => {
       const newCount = parseInt(countEl.value, 10) || 2;
       data.semesterCount = newCount;
-      // ensure history keys exist
       for(let i=1;i<=3;i++) if(!data.history[i]) data.history[i] = [];
       saveSemesterData(data);
       renderSemesterControls();
-      loadGpaHistory(); // refresh
+      loadGpaHistory();
     };
   }
 
   if(currentEl){
-    // populate options
     currentEl.innerHTML = "";
     for(let i=1;i<=data.semesterCount;i++){
       const opt = document.createElement("option");
@@ -326,13 +341,13 @@ function renderSemesterControls(){
   }
 }
 
-/* GPA history UI */
+/* GPA history UI rendering */
 function loadGpaHistory(){
   const container = $("#gpaHistory");
   if(!container) return;
   const data = loadSemesterData();
   const sem = String(data.currentSemester || 1);
-  const history = data.history && data.history[sem] ? data.history[sem] : [];
+  const history = (data.history && data.history[sem]) ? data.history[sem] : [];
 
   if(history.length === 0){
     container.innerHTML = "<div class='small-muted'>No GPA records saved for this semester.</div>";
@@ -352,7 +367,7 @@ function loadGpaHistory(){
 
   // attach delete handlers
   container.querySelectorAll(".del-btn").forEach(btn=>{
-    btn.onclick = (e) => {
+    btn.onclick = () => {
       const index = parseInt(btn.dataset.idx, 10);
       deleteGpaEntry(index);
     };
@@ -400,12 +415,76 @@ function clearGpaHistory(){
 
 function autoSaveGpaFromAi(text, html){
   if(!text) return;
-  // Try to extract a short title — look for "Unweighted GPA:" or first line
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   let title = lines.find(l => /Unweighted/i.test(l)) || lines[0] || "GPA Result";
-  // create short summary (first 240 chars)
   const summary = text.substring(0, 240);
   saveGpaEntry(title, summary);
+}
+
+/* ==========================================================
+   Saved-By-Date GPA (Sem tabs, date list, detail view)
+   Data stored under "gpaSavedByDate" as:
+   { "Sem1": { "2025-12-03": "<html>" }, "Sem2": { ... } }
+=========================================================== */
+
+const GPA_DATE_KEY = "gpaSavedByDate";
+
+function loadGpaSavedByDate(){
+  return load(GPA_DATE_KEY, {"Sem1": {}, "Sem2": {}});
+}
+
+function saveGpaSavedByDate(obj){
+  save(GPA_DATE_KEY, obj);
+}
+
+/* Save current AI output (from #aiGpaOutput) under today's date & current semester */
+function saveCurrentAIGPA(){
+  const outEl = $("#aiGpaOutput");
+  if(!outEl) return alert("No AI output element found.");
+  const html = outEl.innerHTML.trim();
+  if(!html) return alert("No AI-generated GPA to save. Generate first.");
+
+  const data = loadGpaSavedByDate();
+  const semData = loadSemesterData();
+  const sem = "Sem" + (semData.currentSemester || 1);
+  const date = (new Date()).toISOString().split("T")[0];
+
+  if(!data[sem]) data[sem] = {};
+  data[sem][date] = html;
+  saveGpaSavedByDate(data);
+  renderGpaSavedDates();
+  alert("Saved AI GPA for " + date + " (" + sem + ")");
+}
+
+/* Render list of saved dates for the active semester */
+function renderGpaSavedDates(){
+  const listEl = $("#gpaSavedDates");
+  const detailEl = $("#gpaSavedDetail");
+  if(!listEl) return;
+  const data = loadGpaSavedByDate();
+  const semData = loadSemesterData();
+  const sem = "Sem" + (semData.currentSemester || 1);
+  const semObj = data[sem] || {};
+  const dates = Object.keys(semObj).sort().reverse();
+
+  if(dates.length === 0){
+    listEl.innerHTML = "<div class='small-muted'>No saved GPAs for this semester yet.</div>";
+    if(detailEl) detailEl.innerHTML = "";
+    return;
+  }
+
+  listEl.innerHTML = dates.map(d => `<div class="gpa-date" data-date="${d}">📅 ${d}</div>`).join("");
+
+  // attach click handlers
+  listEl.querySelectorAll(".gpa-date").forEach(el=>{
+    el.onclick = () => {
+      const date = el.dataset.date;
+      if(detailEl) detailEl.innerHTML = semObj[date] || "<div class='small-muted'>No data</div>";
+    };
+  });
+
+  // auto-show first detail
+  if(detailEl) detailEl.innerHTML = semObj[dates[0]] || "";
 }
 
 /* ==========================================================
@@ -418,10 +497,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
   restoreInputs();
   restoreOutputs();
 
+  // restore logo if set
   const savedLogo = load("logoURL", "");
   if(savedLogo) setLogo(savedLogo);
 
-  // Render semester controls (if present)
+  // Render semester controls if present
   renderSemesterControls();
 
   // wire clear history button if present
@@ -433,18 +513,26 @@ document.addEventListener("DOMContentLoaded", ()=>{
     });
   }
 
-  // wire clear semesterData (if admin button exists) - optional id: clearAllSemesters
-  const clearAllSem = $("#clearAllSemesters");
-  if(clearAllSem){
-    clearAllSem.addEventListener("click", ()=>{
-      if(!confirm("Clear ALL semester data? This cannot be undone.")) return;
-      saveSemesterData(defaultSemesterData());
-      renderSemesterControls();
-      loadGpaHistory();
+  // wire saveAI button if present (#saveAiGpa or inline onclick saveCurrentAIGPA)
+  const saveAiBtn = $("#saveAiGpa");
+  if(saveAiBtn){
+    saveAiBtn.addEventListener("click", saveCurrentAIGPA);
+  }
+
+  // wire saved-by-date rendering
+  renderGpaSavedDates();
+
+  // wire clear saved-by-date button if present
+  const clearSavedByDateBtn = $("#clearSavedByDate");
+  if(clearSavedByDateBtn){
+    clearSavedByDateBtn.addEventListener("click", ()=>{
+      if(!confirm("Clear all saved GPAs by date?")) return;
+      saveGpaSavedByDate({"Sem1": {}, "Sem2": {}});
+      renderGpaSavedDates();
     });
   }
 
-  // auto-load GPA history
+  // wire delete buttons inside GPA history container (delegation not necessary because we attach when building)
   loadGpaHistory();
 });
 
@@ -458,7 +546,6 @@ window.generateAndRender = generateAndRender;
 window.downloadOutput = downloadOutput;
 window.bookmarkPage = bookmarkPage;
 
-/* GPA & semester functions */
 window.loadGpaHistory = loadGpaHistory;
 window.saveGpaEntry = saveGpaEntry;
 window.deleteGpaEntry = deleteGpaEntry;
@@ -468,3 +555,12 @@ window.saveSemesterData = saveSemesterData;
 window.renderSemesterControls = renderSemesterControls;
 window.clearAllSemesterData = () => { saveSemesterData(defaultSemesterData()); renderSemesterControls(); loadGpaHistory(); };
 window.autoSaveGpaFromAi = autoSaveGpaFromAi;
+
+window.saveCurrentAIGPA = saveCurrentAIGPA;
+window.renderGpaSavedDates = renderGpaSavedDates;
+window.openSavedGpa = (date) => { // convenience
+  const detailEl = $("#gpaSavedDetail");
+  const data = loadGpaSavedByDate();
+  const sem = "Sem" + (loadSemesterData().currentSemester || 1);
+  if(detailEl) detailEl.innerHTML = (data[sem] && data[sem][date]) ? data[sem][date] : "<div class='small-muted'>No data</div>";
+};
