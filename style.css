@@ -189,18 +189,17 @@ textarea{min-height:120px;resize:vertical}
   object-fit: cover;
 }
 
-/* left circle — shifted slightly left */
+/* Left circle — moved slightly more left */
 .circle.left {
-  left: 40px;
+  left: 20px;
   top: 20px;
 }
 
-/* right circle — overlaps and slightly higher */
+/* Right circle — moved slightly more right & still a bit higher */
 .circle.right {
-  left: 80px;
+  left: 120px;
   top: 0px;
 }
-
 
 /* About Me Box */
 .about-box {
