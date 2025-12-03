@@ -1,0 +1,111 @@
+:root{
+  --sidebar-bg: #0a1a33;
+  --sidebar-hover: #12315c;
+  --accent: #0066ff;
+  --accent-2: #004dcc;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --panel-shadow: 0 6px 20px rgba(11,19,40,0.06);
+  --radius: 12px;
+  --glass: rgba(255,255,255,0.6);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:#f7fafc;color:#0b1220}
+
+/* layout */
+.app {
+  display:flex;
+  min-height:100vh;
+}
+
+/* sidebar */
+.sidebar{
+  width:80px;
+  background:var(--sidebar-bg);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  padding:20px 10px;
+  transition:width .22s ease;
+  gap:12px;
+}
+.sidebar.expanded{width:240px}
+
+.logo-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:6px 0 14px;
+}
+.logo{
+  width:56px;height:56px;border-radius:50%;overflow:hidden;background:#fff;display:block;
+}
+.logo img{width:100%;height:100%;object-fit:cover}
+
+/* nav items */
+.nav{
+  display:flex;flex-direction:column;gap:8px;margin-top:6px;
+}
+.nav a{
+  display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;color:#dbeafe;text-decoration:none;background:transparent;font-weight:600;
+}
+.nav a .icon{font-size:20px;width:30px;text-align:center}
+.nav a .label{opacity:0;transition:opacity .18s ease}
+.sidebar.expanded .nav a .label{opacity:1}
+.nav a:hover{background:var(--sidebar-hover)}
+.sidebar-footer{margin-top:auto;display:flex;flex-direction:column;gap:8px;align-items:center}
+.small-muted{font-size:12px;color:rgba(255,255,255,0.85);text-align:center;padding:6px 8px}
+
+/* main area */
+.main{
+  flex-grow:1;
+  background:#fff;
+  padding:28px;
+  overflow:auto;
+}
+
+/* header */
+.header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;
+}
+.h-title{font-size:20px;margin:0}
+.h-sub{color:var(--muted);font-size:13px}
+
+/* cards / panels */
+.grid{display:grid;grid-template-columns:420px 1fr;gap:18px}
+@media (max-width:1000px){ .grid{grid-template-columns:1fr} .sidebar{position:fixed;bottom:0;left:0;width:100%;height:auto;display:flex;flex-direction:row;padding:10px} .main{padding:18px;margin-bottom:70px} .sidebar.expanded{width:100%} .logo{width:40px;height:40px} .nav a{padding:8px} }
+
+.card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--panel-shadow);display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:1.05rem}
+.label{font-weight:700;color:var(--muted);font-size:13px;margin-top:6px}
+
+/* inputs */
+input,textarea,select{
+  width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef7;background:transparent;font-size:14px;
+}
+textarea{min-height:120px;resize:vertical}
+
+/* buttons */
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+.btn.ghost{background:transparent;border:1px solid rgba(11,19,40,0.05);color:var(--muted)}
+.btn.outline{background:transparent;border:1px solid rgba(11,19,40,0.08);color:var(--muted)}
+.btn.secondary{background:var(--accent-2)}
+
+/* output */
+.output{background:linear-gradient(180deg,#fbfdff,#f6f9fc);border-radius:10px;padding:14px;border:1px solid rgba(11,19,40,0.04);min-height:180px;overflow:auto}
+.output h3{margin:6px 0}
+.output p{margin:0 0 10px 0;line-height:1.45}
+.output ul{margin:8px 0 12px 20px}
+.output li{margin-bottom:6px}
+
+/* loading */
+.loading{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted)}
+.spinner{width:44px;height:44px;border-radius:50%;border:6px solid rgba(6,11,20,0.06);border-top-color:var(--accent);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* small helpers */
+.hint{font-size:13px;color:var(--muted)}
+.note{font-size:13px;color:#0b1220;background:#f5f8ff;padding:10px;border-radius:8px;border:1px solid rgba(6,11,20,0.03)}
+.footer-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}

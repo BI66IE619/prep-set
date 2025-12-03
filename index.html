@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PrepSet — Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo-wrap">
+        <div class="logo"><img src="https://files.catbox.moe/whpn5j.png" alt="logo"></div>
+      </div>
+
+      <nav class="nav">
+        <a href="index.html"><span class="icon">🏠</span><span class="label link-text">Home</span></a>
+        <a href="college-finder.html"><span class="icon">🎓</span><span class="label link-text">College Finder</span></a>
+        <a href="essay.html"><span class="icon">✍️</span><span class="label link-text">Essay Helper</span></a>
+        <a href="interview.html"><span class="icon">🎤</span><span class="label link-text">Interview Prep</span></a>
+        <a href="study-plan.html"><span class="icon">📚</span><span class="label link-text">4-Year Plan</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <!-- <button class="btn ghost" onclick="promptLogo()">Upload Logo</button> -->
+        <button class="btn ghost" onclick="toggleSidebar()">☰</button>
+        <div class="small-muted">All data saved locally. No accounts required.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <h1 class="h-title">Welcome to PrepSet</h1>
+          <div class="h-sub">Private. Local. AI-powered guidance for planning your college path.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Your privacy-first toolkit</h2>
+          <p class="hint">Everything you enter stays on your device (localStorage) — only AI requests use the key you supply in the app. Use the sidebar to jump into tools.</p>
+          <div class="note">Tip: Start your 4 year plan early and download the generated plan to get on your path to success before others!</div>
+        </div>
+
+        <div class="card">
+          <h2>Quick Start</h2>
+          <p class="hint">Try the College Finder to generate reach/target/safety suggestions, then build a 4-year plan tailored to those goals. Use Essay Helper to get constructive feedback (not full write-ups).</p>
+          <div class="row">
+            <a class="btn" href="college-finder.html">Start College Finder</a>
+            <a class="btn outline" href="study-plan.html">Build 4-Year Plan</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:30px"></div>
+
+      <div class="card">
+        <h2>About this app</h2>
+        <p class="hint">This app is intentionally simple: no logins, no analytics, all data local. AI calls require a key configured through backend code.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
