@@ -164,11 +164,18 @@ textarea{min-height:120px;resize:vertical}
   margin-bottom: 40px;
 }
 
-/* Overlapping circles */
+/* ---- Overlapping circles (CENTERED) ---- */
+
 .circle-wrapper {
   position: relative;
+  width: 380px;        /* ensures perfect centering */
   height: 220px;
   margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .circle {
@@ -187,13 +194,15 @@ textarea{min-height:120px;resize:vertical}
   object-fit: cover;
 }
 
-/* Force overlap — permanently */
+/* Left circle */
 .circle.left {
-  left: -100px;
-  top: 10px;
+  left: 0;
+  top: 15px;
 }
+
+/* Right circle */
 .circle.right {
-  left: 100px;
+  right: 0;
   top: 0;
 }
 
