@@ -183,3 +183,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
 window.toggleSidebar = toggleSidebar;
 window.generateAndRender = generateAndRender;
 window.downloadOutput = downloadOutput;
+
+function bookmarkPage() {
+    const title = document.title;
+    const url = window.location.href;
+
+    if (window.sidebar && window.sidebar.addPanel) { 
+        // Firefox <=22
+        window.sidebar.addPanel(title, url, '');
+    } else if (window.external && ('AddFavorite' in window.external)) { 
+        // IE Favorite
+        window.external.AddFavorite(url, title);
+    } else {
+        // Modern browsers
+        alert('Press Ctrl+D (Cmd+D on Mac) to bookmark this page.');
+    }
+}
