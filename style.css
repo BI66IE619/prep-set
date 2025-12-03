@@ -110,126 +110,109 @@ textarea{min-height:120px;resize:vertical}
 .note{font-size:13px;color:#0b1220;background:#f5f8ff;padding:10px;border-radius:8px;border:1px solid rgba(6,11,20,0.03)}
 .footer-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
 
-/* ================================
-   GETTING STARTED (index.html)
-   ================================ */
+/* =============================
+   FULLSCREEN LANDING PAGE
+   ============================= */
 
-/* Big hero section */
-.getting-started-hero {
-  text-align: center;
-  padding: 60px 20px;
-  max-width: 900px;
-  margin: auto;
+.landing-body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  font-family: Inter, system-ui, sans-serif;
 }
 
-.getting-started-hero h1 {
-  font-size: 2.4rem;
+.landing-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+  text-align: center;
+}
+
+/* HERO */
+.landing-hero h1 {
+  font-size: 36px;
+  font-weight: 800;
   margin-bottom: 14px;
   color: #0b1220;
 }
 
-.getting-started-hero p {
-  font-size: 1.1rem;
-  color: var(--muted);
+.landing-desc {
   max-width: 700px;
   margin: 0 auto;
+  font-size: 17px;
   line-height: 1.6;
+  color: #4a5568;
 }
 
-
-/* Overlapping circular images */
-.circle-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 50px 0;
+/* OVERLAPPING CIRCLES */
+.landing-images {
+  margin: 60px 0;
   position: relative;
-  height: 200px;
+  height: 220px;
 }
 
-.circle {
-  width: 170px;
-  height: 170px;
+.circle-img {
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  background: #e5edff;
-  border: 5px solid var(--accent);
-  overflow: hidden;
+  background: #e9eef8;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  background-size: cover;
+  background-position: center;
   position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: var(--panel-shadow);
 }
 
-.circle.left {
+.circle-left {
   left: 50%;
   transform: translateX(-120%);
+  top: 40px;
 }
 
-.circle.right {
+.circle-right {
   right: 50%;
   transform: translateX(120%);
-  top: -20px;
+  top: 0px; /* slightly higher */
 }
 
-.circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* ABOUT ME */
+.landing-about {
+  margin-top: 40px;
+  text-align: center;
 }
 
-
-/* ABOUT ME section */
-.about-wrapper {
-  max-width: 900px;
-  margin: 60px auto;
-  background: var(--card);
-  padding: 30px;
-  border-radius: var(--radius);
-  box-shadow: var(--panel-shadow);
-}
-
-.about-wrapper h2 {
-  margin-top: 0;
-  font-size: 1.6rem;
+.landing-about h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 14px;
   color: #0b1220;
 }
 
-.about-wrapper p {
-  font-size: 1rem;
-  color: var(--muted);
-  line-height: 1.6;
+.landing-about p {
+  max-width: 760px;
+  margin: 0 auto 16px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #4a5568;
 }
 
+/* BUTTON */
+.landing-btn-wrap {
+  margin-top: 50px;
+}
 
-/* ================================
-   UNIVERSAL MOBILE FIXES FOR NEW ELEMENTS
-   ================================ */
-@media (max-width: 700px) {
+.landing-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  padding: 14px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 6px 15px rgba(0,102,255,0.25);
+  transition: 0.2s ease;
+}
 
-  .circle-wrap {
-    height: 150px;
-  }
-
-  .circle {
-    width: 120px;
-    height: 120px;
-  }
-
-  .circle.left {
-    transform: translateX(-110%);
-  }
-
-  .circle.right {
-    transform: translateX(110%);
-    top: -10px;
-  }
-
-  .getting-started-hero h1 {
-    font-size: 1.9rem;
-  }
-
-  .about-wrapper {
-    padding: 20px;
-  }
+.landing-btn:hover {
+  background: var(--accent-2);
 }
