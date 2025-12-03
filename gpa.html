@@ -6,248 +6,284 @@
   <title>PrepSet - GPA Calculator</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="app">
-    <aside class="sidebar" id="sidebar">
-      <div class="logo-wrap">
-        <div class="logo"><img src="https://files.catbox.moe/whpn5j.png" alt="logo"></div>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-wrap">
+      <div class="logo"><img src="https://files.catbox.moe/whpn5j.png" alt="logo"></div>
+    </div>
+
+    <nav class="nav">
+      <a href="main.html"><span class="icon">🏠</span><span class="label">Home</span></a>
+      <a href="college-finder.html"><span class="icon">🎓</span><span class="label">College Finder</span></a>
+      <a href="essay.html"><span class="icon">✍️</span><span class="label">Essay Helper</span></a>
+      <a href="interview.html"><span class="icon">🎤</span><span class="label">Interview Prep</span></a>
+      <a href="study-plan.html"><span class="icon">📚</span><span class="label">4-Year Plan</span></a>
+      <a href="gpa.html" class="active"><span class="icon">📊</span><span class="label">GPA Calculator</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn ghost" onclick="toggleSidebar()">☰</button>
+      <div class="small-muted">All data saved locally.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <div class="header">
+      <h1 class="h-title">GPA Calculator</h1>
+      <div class="h-sub">AI-powered GPA tracking saved by semester and date.</div>
+    </div>
+
+    <div class="grid">
+
+      <!-- SEMESTER SETTINGS -->
+      <div class="card">
+        <h2>Semester Mode</h2>
+
+        <label class="label">Choose semester structure:</label>
+        <select id="semesterMode">
+          <option value="2">2 Semesters</option>
+          <option value="3">3 Trimesters</option>
+        </select>
+
+        <label class="label">Current Semester:</label>
+        <select id="currentSemester"></select>
+
+        <button class="btn" id="saveSemesterSettings">Save Settings</button>
       </div>
 
-      <nav class="nav">
-        <a href="main.html"><span class="icon">🏠</span><span class="label link-text">Home</span></a>
-        <a href="college-finder.html"><span class="icon">🎓</span><span class="label link-text">College Finder</span></a>
-        <a href="essay.html"><span class="icon">✍️</span><span class="label link-text">Essay Helper</span></a>
-        <a href="interview.html"><span class="icon">🎤</span><span class="label link-text">Interview Prep</span></a>
-        <a href="study-plan.html"><span class="icon">📚</span><span class="label link-text">4-Year Plan</span></a>
-        <a href="gpa.html" class="active"><span class="icon">📊</span><span class="label link-text">GPA Calculator</span></a>
-      </nav>
+      <!-- MANUAL GPA CALCULATOR -->
+      <div class="card">
+        <h2>Manual GPA</h2>
 
-      <div class="sidebar-footer">
-        <button class="btn ghost" onclick="toggleSidebar()">☰</button>
-        <div class="small-muted">All data saved locally. No accounts required.</div>
-      </div>
-    </aside>
+        <div id="gradeInputs"></div>
+        <button class="btn ghost" id="addClass">Add Class</button>
 
-    <main class="main">
-      <div class="header">
-        <h1 class="h-title">GPA Calculator</h1>
-        <div class="h-sub">Track your GPA, semesters, and AI-generated estimates.</div>
+        <div class="row">
+          <button class="btn" id="calcGPA">Calculate</button>
+          <button class="btn outline" onclick="downloadOutput('gpaOutput','gpa-history')">Download</button>
+          <button class="btn ghost" id="clearGPA">Clear</button>
+        </div>
+
+        <div id="gpaOutput" class="output" data-save="gpaHistory"></div>
       </div>
 
-      <div class="grid">
+      <!-- AI GPA ESTIMATOR -->
+      <div class="card">
+        <h2>AI GPA Estimator</h2>
 
-        <!-- Semester Settings -->
-        <div class="card">
-          <h2>Semester Mode</h2>
+        <label class="label">Describe your grades</label>
+        <textarea id="aiGpaInput" rows="4"></textarea>
+        <button class="btn" id="genAI">Generate AI GPA</button>
 
-          <label class="label">Choose semester structure:</label>
-          <select id="semesterMode">
-            <option value="2">2 Semesters</option>
-            <option value="3">3 Trimester System</option>
-          </select>
-
-          <label class="label">Current Semester:</label>
-          <select id="currentSemester"></select>
-
-          <button class="btn" id="saveSemesterSettings">Save</button>
-        </div>
-
-        <!-- Manual GPA Calculator -->
-        <div class="card">
-          <h2>Manual GPA Input</h2>
-
-          <div id="gradeInputs"></div>
-
-          <button class="btn ghost" id="addClass">Add Class</button>
-
-          <div class="row">
-            <button class="btn" id="calcGPA">Calculate</button>
-            <button class="btn outline" onclick="downloadOutput('gpaOutput','gpa-history')">Download</button>
-            <button class="btn ghost" id="clearGPA">Clear</button>
-          </div>
-
-          <div id="gpaOutput" class="output" data-save="gpaHistory"></div>
-        </div>
-
-        <!-- AI GPA Generator -->
-        <div class="card">
-          <h2>AI GPA Estimator</h2>
-
-          <label class="label">Describe your grades (ex: 3 A’s, 2 B’s, 1 AP A-)</label>
-          <textarea id="aiGpaInput" rows="4"></textarea>
-
-          <button class="btn" id="genAI">Generate AI GPA</button>
-
-          <div id="aiGpaOutput" class="output" data-save="aiGpa"></div>
-        </div>
-
-        <!-- GPA History -->
-        <div class="card">
-          <h2>GPA Tracker (Saved Over Time)</h2>
-
-          <button class="btn" id="saveToHistory">Save Current GPA</button>
-
-          <div id="historyList" class="output" data-save="gpaTimeline"></div>
-        </div>
-
+        <div id="aiGpaOutput" class="output" data-save="aiGpa"></div>
       </div>
 
-    </main>
-  </div>
+      <!-- SAVED GPA HISTORY -->
+      <div class="card">
+        <h2>Saved GPA Timeline</h2>
 
-  <script src="app.js"></script>
+        <button class="btn" id="saveToHistory">Save Current GPA</button>
 
-  <script>
-    // --------------------------
-    // LOAD SEMESTER MODE
-    // --------------------------
-    const semesterMode = document.getElementById("semesterMode");
-    const currentSemester = document.getElementById("currentSemester");
+        <div class="tabs">
+          <button class="tab active" data-tab="sem1">Semester 1</button>
+          <button class="tab" data-tab="sem2">Semester 2</button>
+        </div>
 
-    function loadSemesterSettings() {
-      const savedMode = load("semesterMode") || "2";
-      const savedCurrent = load("currentSemester") || "1";
+        <div id="historyList" class="output"></div>
+      </div>
 
-      semesterMode.value = savedMode;
+    </div> <!-- grid -->
 
-      refreshSemesterOptions(savedMode);
-      currentSemester.value = savedCurrent;
-    }
+  </main>
+</div>
 
-    function refreshSemesterOptions(mode) {
-      currentSemester.innerHTML = "";
-      const count = Number(mode);
-      for (let i = 1; i <= count; i++) {
-        const opt = document.createElement("option");
-        opt.value = i;
-        opt.textContent = "Semester " + i;
-        currentSemester.appendChild(opt);
-      }
-    }
+<script src="app.js"></script>
 
-    document.getElementById("saveSemesterSettings").onclick = () => {
-      save("semesterMode", semesterMode.value);
-      save("currentSemester", currentSemester.value);
-      alert("✔ Semester settings saved!");
+<script>
+/* ------------------------------
+   SEMESTER SETTINGS
+--------------------------------*/
+const semesterMode = document.getElementById("semesterMode");
+const currentSemester = document.getElementById("currentSemester");
+
+function loadSemesterSettings() {
+  const savedMode = load("semesterMode") || "2";
+  const savedCurrent = load("currentSemester") || "1";
+
+  semesterMode.value = savedMode;
+  refreshSemesterOptions(savedMode);
+  currentSemester.value = savedCurrent;
+}
+
+function refreshSemesterOptions(mode) {
+  currentSemester.innerHTML = "";
+  const count = Number(mode);
+  for (let i = 1; i <= count; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = "Semester " + i;
+    currentSemester.appendChild(opt);
+  }
+}
+
+document.getElementById("saveSemesterSettings").onclick = () => {
+  save("semesterMode", semesterMode.value);
+  save("currentSemester", currentSemester.value);
+  alert("✔ Semester settings saved!");
+};
+
+/* ------------------------------
+   MANUAL GPA CALCULATOR
+--------------------------------*/
+const gradeInputs = document.getElementById("gradeInputs");
+
+function addClassRow(grade = "", weight = "") {
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `
+    <input class="half" placeholder="Grade (A, B+, C-...)" value="${grade}">
+    <input class="half" placeholder="Weight (1 regular, 1.1 honors, 1.2 AP)" value="${weight}">
+  `;
+  gradeInputs.appendChild(row);
+}
+
+document.getElementById("addClass").onclick = () => addClassRow();
+
+// Load existing saved classes
+const savedClasses = JSON.parse(load("classRows") || "[]");
+savedClasses.forEach(cls => addClassRow(cls.grade, cls.weight));
+if (savedClasses.length === 0) addClassRow();
+
+document.getElementById("calcGPA").onclick = () => {
+  const rows = [...gradeInputs.querySelectorAll(".row")];
+  let total = 0, count = 0;
+
+  rows.forEach(r => {
+    const [gEl, wEl] = r.querySelectorAll("input");
+    const g = gEl.value.trim().toUpperCase();
+    const w = parseFloat(wEl.value) || 1;
+
+    const scale = {
+      "A+": 4.0, "A": 4.0, "A-": 3.7,
+      "B+": 3.3, "B": 3.0, "B-": 2.7,
+      "C+": 2.3, "C": 2.0, "C-": 1.7,
+      "D": 1.0, "F": 0
     };
 
-    // --------------------------
-    // MANUAL GPA CALCULATOR
-    // --------------------------
-    const gradeInputs = document.getElementById("gradeInputs");
-
-    function addClassRow(grade = "", weight = "") {
-      const row = document.createElement("div");
-      row.className = "row";
-      row.innerHTML = `
-        <input class="half" placeholder="Grade (A, B+, C-...)" value="${grade}">
-        <input class="half" placeholder="Weight (1 for regular, 1.1 honors, 1.2 AP)" value="${weight}">
-      `;
-      gradeInputs.appendChild(row);
+    if (scale[g] !== undefined) {
+      total += scale[g] * w;
+      count++;
     }
+  });
 
-    document.getElementById("addClass").onclick = () => addClassRow();
+  const unweighted = total / count;
+  const weighted = total / count;
 
-    // Auto-load saved class rows
-    const savedClasses = JSON.parse(load("classRows") || "[]");
-    savedClasses.forEach(cls => addClassRow(cls.grade, cls.weight));
-    if (savedClasses.length === 0) addClassRow();
+  const output = `
+    <b>Unweighted GPA:</b> ${unweighted.toFixed(3)}<br>
+    <b>Weighted GPA:</b> ${weighted.toFixed(3)}<br>
+    <b>Classes Counted:</b> ${count}
+  `;
 
-    document.getElementById("calcGPA").onclick = () => {
-      const rows = [...gradeInputs.querySelectorAll(".row")];
-      let total = 0, count = 0;
+  document.getElementById("gpaOutput").innerHTML = output;
 
-      rows.forEach(r => {
-        const [gEl, wEl] = r.querySelectorAll("input");
-        const g = gEl.value.trim().toUpperCase();
-        const w = parseFloat(wEl.value) || 1;
+  save("gpaHistory", output);
 
-        const scale = {
-          "A+": 4.0, "A": 4.0, "A-": 3.7,
-          "B+": 3.3, "B": 3.0, "B-": 2.7,
-          "C+": 2.3, "C": 2.0, "C-": 1.7,
-          "D": 1.0, "F": 0
-        };
+  // Save input rows
+  const rowsToSave = rows.map(r => {
+    const [gEl, wEl] = r.querySelectorAll("input");
+    return { grade: gEl.value, weight: wEl.value };
+  });
+  save("classRows", JSON.stringify(rowsToSave));
+};
 
-        if (scale[g] !== undefined) {
-          total += scale[g] * w;
-          count++;
-        }
-      });
+document.getElementById("clearGPA").onclick = () => {
+  gradeInputs.innerHTML = "";
+  addClassRow();
+  save("classRows", "[]");
+  document.getElementById("gpaOutput").innerHTML = "";
+  save("gpaHistory", "");
+};
 
-      const unweighted = total / count;
-      const weighted = total / count;
+/* ------------------------------
+   AI GPA GENERATOR
+--------------------------------*/
+document.getElementById("genAI").onclick = () => {
+  const text = document.getElementById("aiGpaInput").value;
 
-      const out = `
-        <b>Unweighted GPA:</b> ${unweighted.toFixed(3)}<br>
-        <b>Weighted GPA:</b> ${weighted.toFixed(3)}<br>
-        <b>Classes Counted:</b> ${count}
-      `;
-      document.getElementById("gpaOutput").innerHTML = out;
+  const prompt = `
+  You are an AI GPA calculator. Based on: "${text}"
+  Generate:
+  - Estimated unweighted GPA
+  - Estimated weighted GPA
+  - Grade breakdown
+  - AP/Honors effect
+  - 1-sentence summary
+  `;
 
-      // Save rows
-      const saved = rows.map(r => {
-        const [gEl, wEl] = r.querySelectorAll("input");
-        return { grade: gEl.value, weight: wEl.value };
-      });
-      save("classRows", JSON.stringify(saved));
+  generateAndRender(prompt, "aiGpaOutput", "aiGpa");
+};
 
-      save("gpaHistory", out);
-    };
+/* ------------------------------
+   SAVED GPA TIMELINE
+--------------------------------*/
 
-    document.getElementById("clearGPA").onclick = () => {
-      gradeInputs.innerHTML = "";
-      addClassRow();
-      save("classRows", "[]");
-      document.getElementById("gpaOutput").innerHTML = "";
-      save("gpaHistory", "");
-    };
+let history = JSON.parse(load("gpaTimeline") || "{}");
+if (!history.sem1) history.sem1 = [];
+if (!history.sem2) history.sem2 = [];
 
-    // --------------------------
-    // AI GPA GENERATOR
-    // --------------------------
-    document.getElementById("genAI").onclick = () => {
-      const desc = document.getElementById("aiGpaInput").value;
+const historyList = document.getElementById("historyList");
+const tabs = document.querySelectorAll(".tab");
+let activeTab = "sem1";
 
-      const prompt = `
-      You are a GPA calculator AI. Based on this description: "${desc}",
-      generate:
-      - Estimated unweighted GPA
-      - Estimated weighted GPA
-      - Grade breakdown
-      - AP / Honors effect
-      - 1–sentence summary
-      Format clean lines.
-      `;
+function renderHistory() {
+  const list = history[activeTab];
+  historyList.innerHTML = list.map((entry, i) => `
+    <div class="history-item">
+      <button onclick="openSaved(${i})">${entry.date}</button>
+    </div>
+  `).join("");
+}
 
-      generateAndRender(prompt, "aiGpaOutput", "aiGpa");
-    };
+function openSaved(index) {
+  const entry = history[activeTab][index];
+  const output = document.getElementById("aiGpaOutput");
+  output.innerHTML = entry.aiSummary;
+}
 
-    // -------------------------
-    // GPA TRACKER HISTORY
-    // -------------------------
-    const historyList = document.getElementById("historyList");
-    let timeline = JSON.parse(load("gpaTimeline") || "[]");
+document.getElementById("saveToHistory").onclick = () => {
+  const aiSummary = document.getElementById("aiGpaOutput").innerHTML.trim();
+  if (!aiSummary) return alert("Generate an AI GPA first.");
 
-    function renderHistory() {
-      historyList.innerHTML = timeline
-        .map((t, i) => `<div>${i+1}. ${t}</div>`)
-        .join("");
-    }
+  const date = new Date().toLocaleString();
 
+  history[activeTab].push({
+    date,
+    aiSummary
+  });
+
+  save("gpaTimeline", JSON.stringify(history));
+  renderHistory();
+};
+
+tabs.forEach(tab => {
+  tab.onclick = () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    activeTab = tab.dataset.tab;
     renderHistory();
+  };
+});
 
-    document.getElementById("saveToHistory").onclick = () => {
-      const curr = document.getElementById("gpaOutput").innerHTML;
-      if (!curr.trim()) return alert("Calculate a GPA first.");
-      timeline.push(curr);
-      save("gpaTimeline", JSON.stringify(timeline));
-      renderHistory();
-    };
-
-    // INIT
-    loadSemesterSettings();
-  </script>
+renderHistory();
+loadSemesterSettings();
+</script>
 
 </body>
 </html>
