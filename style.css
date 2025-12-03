@@ -225,22 +225,23 @@ textarea{min-height:120px;resize:vertical}
   opacity: 0.95;
 }
 
-/* Get Started Button */
-.get-started-btn {
-  margin-top: 35px;
-  background: #ffffff;
-  color: #0a1a33;
-  padding: 14px 28px;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: 800;
-  border: none;
+.start-btn {
+  display: inline-block;
+  background: #0b1e4a;
+  color: white;
+  font-size: 1.4rem;        /* bigger text */
+  padding: 18px 42px;        /* bigger button */
+  border-radius: 12px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-  transition: transform 0.25s ease;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.3s ease;
+  margin-top: 35px;
 }
-.get-started-btn:hover {
-  transform: translateY(-4px);
+
+.start-btn:hover {
+  background: #0d2a6a;
+  transform: translateY(-3px);
 }
 
 /* Social icons */
