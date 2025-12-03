@@ -72,7 +72,7 @@
       // attach button
       const gen = document.getElementById("genColleges");
       gen.addEventListener("click", ()=>{
-        const prompt = `You are an admissions counselor. Based on the profile: GPA:${document.getElementById("gpa").value}; Major:${document.getElementById("major").value}; Interests:${document.getElementById("interests").value}; Scores:${document.getElementById("scores").value}. Return 3 reach, 3 target, 3 safety colleges. For each, include: Name; 1-sentence reason; Approx tuition/year USD; City, State; Typical admitted GPA. Format clean lines and headings.`;
+        const prompt = `You are an admissions counselor. Based on the profile: GPA:${document.getElementById("gpa").value}; Major:${document.getElementById("major").value}; Interests:${document.getElementById("interests").value}; Scores:${document.getElementById("scores").value}. Return 3 reach, 3 target, 3 safety colleges. For each, include: Name; 1-sentence reason; Approx tuition/year USD; City, State; Typical admitted GPA; College Match Score; Likelyhood percentage of being accepted into that college. Format clean lines and headings.`;
         generateAndRender(prompt, "collegeOutput", "collegeData");
       });
 
