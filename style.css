@@ -38,11 +38,21 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe 
   align-items:center;
   margin:6px 0 14px;
 }
-.logo{
-  width:56px;height:56px;border-radius:50%;overflow:hidden;background:#fff;display:block;
-}
-.logo img{width:100%;height:100%;object-fit:cover}
 
+.logo {
+  width:120px;    /* bigger logo */
+  height:120px;
+  border-radius:50%;
+  overflow:hidden;
+  background:#fff;
+  display:block;
+}
+
+.logo img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 /* nav items */
 .nav{
   display:flex;flex-direction:column;gap:8px;margin-top:6px;
