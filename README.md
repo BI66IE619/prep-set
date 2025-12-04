@@ -118,4 +118,4 @@ This is a student educational tool. AI suggestions are guidance only — verify 
 Feel free to submit issues or pull requests to improve functionality, UI, or AI prompts.
 
 📄 License
-MIT License
+Attribution-NonCommercial-NoDerivatives 4.0 International (Copyright 2024-2025)
