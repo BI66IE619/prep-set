@@ -76,14 +76,8 @@ API Key
 
 The AI uses Google Gemini 2.5 Flash.
 
-The API key is hardcoded in app.js.
-Note: This means anyone viewing the source can see the key.
+The API key is located in my secret variables through vercel so to upload to vercel, head to secret variables section and add in GEMINI_API_KEY and in the notes/varibles, add your api found on Google AI Studios, then deploy and it will automatically configure Gemini 2.5 Flash.
 
-If you want to use your own key, replace the API_KEY variable in app.js:
-
-javascript
-Copy code
-const API_KEY = "YOUR_API_KEY_HERE";
 📁 File Structure
 bash
 Copy code
