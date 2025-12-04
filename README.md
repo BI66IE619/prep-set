@@ -1,11 +1,18 @@
-# Prep Set By Jericho - College Preparation AI
+<h1>Prep Set By Jericho — College Preparation AI</h1>
 
-<img src="[https://files.catbox.moe/jptpx5.png](https://files.catbox.moe/whpn5j.png)" alt="Image" height="200" width="200">
-
-**A fully client-side, privacy-safe AI-powered college preparation tool.**  
-This web app helps students plan their high school journey, explore colleges, improve essays, build resumes, and practice interviews — all **without a backend, login, or tracking**. Everything is stored locally in the browser.
-
----
+<table>
+  <tr>
+    <td style="vertical-align: top; padding-right: 15px;">
+      <img src="https://files.catbox.moe/whpn5j.png" alt="Logo" width="180">
+    </td>
+    <td style="vertical-align: top;">
+      <strong>A fully client-side, privacy-safe AI-powered college preparation tool.</strong><br><br>
+      This web app helps students plan their high school journey, explore colleges, improve essays, build resumes,
+      and practice interviews — all <strong>without a backend, login, or tracking</strong>. Everything is stored locally
+      in the browser.
+    </td>
+  </tr>
+</table>
 
 ## 🌟 Features
 
