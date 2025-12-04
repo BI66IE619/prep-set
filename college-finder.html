@@ -23,7 +23,6 @@
       </nav>
 
       <div class="sidebar-footer">
-       <!-- <button class="btn ghost" onclick="promptLogo()">Upload Logo</button> -->
         <button class="btn ghost" onclick="toggleSidebar()">☰</button>
         <div class="small-muted">All data saved locally. No accounts required.</div>
       </div>
@@ -40,14 +39,24 @@
       <div class="grid">
         <div class="card">
           <h2>Student Profile</h2>
+
           <label class="label">GPA</label>
           <input id="gpa" placeholder="e.g. 3.6" />
+
           <label class="label">Intended Major</label>
           <input id="major" placeholder="e.g. Computer Science" />
+
           <label class="label">Interests</label>
           <input id="interests" placeholder="e.g. cybersecurity, robotics" />
-          <label class="label">Test scores</label>
+
+          <label class="label">Test Scores</label>
           <input id="scores" placeholder="SAT / ACT (optional)" />
+
+          <label class="label">Preferred State</label>
+          <input id="state" placeholder="e.g. California, Texas, Any" />
+
+          <label class="label">Extra Notes</label>
+          <input id="notes" placeholder="e.g. max budget, school size, region preferences" />
 
           <div class="row">
             <button class="btn" id="genColleges">Generate</button>
@@ -55,7 +64,7 @@
             <button class="btn ghost" id="clearCollegeInputs">Clear</button>
           </div>
 
-          <div class="hint">Tip: Be specific (major, interests, preferred region) for better matches.</div>
+          <div class="hint">Tip: Add preferences like budget, campus size, or desired school environment.</div>
         </div>
 
         <div class="card">
@@ -68,20 +77,51 @@
   </div>
 
   <script src="app.js"></script>
+
   <script>
-    document.addEventListener("DOMContentLoaded", ()=>{
-      // attach button
+    document.addEventListener("DOMContentLoaded", () => {
+
       const gen = document.getElementById("genColleges");
-      gen.addEventListener("click", ()=>{
-        const prompt = `You are an admissions counselor. Based on the profile: GPA:${document.getElementById("gpa").value}; Major:${document.getElementById("major").value}; Interests:${document.getElementById("interests").value}; Scores:${document.getElementById("scores").value}. Return 3 reach, 3 target, 3 safety colleges. For each, include: Name; 1-sentence reason; Approx tuition/year USD; City, State; Typical admitted GPA; College Match Score; Likelyhood percentage of being accepted into that college. Format clean lines and headings.`;
+      gen.addEventListener("click", () => {
+
+        const prompt = `
+You are an admissions counselor. Based on this student profile:
+
+• GPA: ${document.getElementById("gpa").value}
+• Intended Major: ${document.getElementById("major").value}
+• Interests: ${document.getElementById("interests").value}
+• Test Scores: ${document.getElementById("scores").value}
+• Preferred State: ${document.getElementById("state").value}
+• Extra Notes: ${document.getElementById("notes").value}
+
+Provide **3 reach**, **3 target**, and **3 safety** colleges.
+
+For each college include:
+- College Name
+- One-sentence personalized reason
+- Tuition per year (USD)
+- City, State
+- Typical admitted GPA
+- Match Score (0–100)
+- Acceptance Likelihood %
+
+Format everything with clear headings and clean sections.
+`;
+
         generateAndRender(prompt, "collegeOutput", "collegeData");
       });
 
-      document.getElementById("clearCollegeInputs").addEventListener("click", ()=>{
-        ["gpa","major","interests","scores"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; save(id,""); });
-        document.getElementById("collegeOutput").innerHTML="";
+      document.getElementById("clearCollegeInputs").addEventListener("click", () => {
+        ["gpa","major","interests","scores","state","notes"].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+          save(id, "");
+        });
+
+        document.getElementById("collegeOutput").innerHTML = "";
         save("collegeData","");
       });
+
     });
   </script>
 </body>
