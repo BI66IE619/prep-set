@@ -201,31 +201,37 @@ function bookmarkPage() {
 }
 
 /* =========================
-   Premium Key System (PREPSET-XXXXXXXXXX)
+   PrepSet Premium Key System
    ========================= */
 
-// Example allowed keys
+// ----------------------
+// Allowed keys (add new keys here)
+// Format: PREPSET-XXXXXXXXXX
+// ----------------------
 const PREMIUM_KEYS = [
   "PREPSET-1A2B3C4D5E",
   "PREPSET-9F8G7H6J5K"
 ];
 
-// Duration of premium in milliseconds (30 days)
+// Premium duration in milliseconds (30 days)
 const PREMIUM_DURATION = 30 * 24 * 60 * 60 * 1000;
 
 // Regex to validate key format
 const KEY_REGEX = /^PREPSET-[A-Z0-9]{10}$/i;
 
 // ----------------------
-// Save key and expiration
+// Activate premium
 // ----------------------
 function activatePremium(key) {
   if (KEY_REGEX.test(key) && PREMIUM_KEYS.includes(key.toUpperCase())) {
     const expiry = Date.now() + PREMIUM_DURATION;
     localStorage.setItem("premiumExpiry", expiry);
     localStorage.setItem("premiumKey", key.toUpperCase());
+    alert("Premium activated! Features unlocked for 30 days.");
+    updatePremiumButtons();
     return true;
   } else {
+    alert("Invalid key or wrong format. Must be PREPSET-XXXXXXXXXX");
     return false;
   }
 }
@@ -239,7 +245,7 @@ function isPremiumActive() {
 }
 
 // ----------------------
-// Lock/unlock all premium buttons
+// Update all premium buttons
 // ----------------------
 function updatePremiumButtons() {
   const premiumActive = isPremiumActive();
@@ -257,7 +263,8 @@ function updatePremiumButtons() {
 }
 
 // ----------------------
-// Feature-specific premium check
+// Require premium for a feature
+// featureName = "job", "career", etc.
 // ----------------------
 function requirePremium(featureName = "") {
   if (!isPremiumActive()) {
@@ -280,24 +287,52 @@ function requirePremium(featureName = "") {
 }
 
 // ----------------------
-// Prompt for new key
+// Prompt user for new premium key
 // ----------------------
 function promptPremiumKey() {
   const key = prompt("Enter your premium key (format: PREPSET-XXXXXXXXXX):");
   if (!key) return;
   if (activatePremium(key)) {
-    alert("Premium activated! Features unlocked for 30 days.");
     updatePremiumButtons();
+    updateTimer();
     location.reload();
-  } else {
-    alert("Invalid key or wrong format. Must be PREPSET-XXXXXXXXXX");
   }
 }
+
+// ----------------------
+// Update expiration timer
+// ----------------------
+function updateTimer(timerElementId = "premiumTimer") {
+  const timerEl = document.getElementById(timerElementId);
+  if (!timerEl) return;
+
+  const expiry = parseInt(localStorage.getItem("premiumExpiry") || "0");
+  const diff = expiry - Date.now();
+
+  if (diff <= 0) {
+    timerEl.innerText = "Premium expired.";
+    return;
+  }
+
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+  const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+  const seconds = Math.floor((diff % (1000*60)) / 1000);
+
+  timerEl.innerText = `Premium expires in ${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+// ----------------------
+// Timer interval
+// ----------------------
+setInterval(() => {
+  updateTimer();
+}, 1000);
 
 // ----------------------
 // Initialization
 // ----------------------
 document.addEventListener("DOMContentLoaded", () => {
+  // Lock/unlock premium buttons on page load
   updatePremiumButtons();
 });
-
