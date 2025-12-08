@@ -294,3 +294,27 @@ textarea{min-height:120px;resize:vertical}
   opacity: 0.75;
   font-size: 14px;
 }
+
+/* Premium Lock Styling */
+.locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.premium-block {
+  padding: 30px;
+  text-align: center;
+  background: #131a2a;
+  color: white;
+  border-radius: 12px;
+  margin-top: 20px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+}
+
+.hidden {
+  display: none;
+}
+
+.premium-btn .label {
+  margin-left: 8px;
+}
