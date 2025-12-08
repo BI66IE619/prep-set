@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PrepSet - Job Finder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo-wrap">
+        <img class="logo" src="https://files.catbox.moe/whpn5j.png" alt="logo">
+      </div>
+
+      <nav class="nav">
+        <a href="main.html"><span class="icon">🏠</span><span class="label link-text">Home</span></a>
+        <a href="college-finder.html"><span class="icon">🎓</span><span class="label link-text">College Finder</span></a>
+        <a href="essay.html"><span class="icon">✍️</span><span class="label link-text">Essay Helper</span></a>
+        <a href="interview.html"><span class="icon">🎤</span><span class="label link-text">Interview Prep</span></a>
+        <a href="study-plan.html"><span class="icon">📚</span><span class="label link-text">4-Year Plan</span></a>
+        <a href="gpa.html"><span class="icon">📊</span><span class="label link-text">GPA Calculator</span></a>
+
+        <!-- PREMIUM BUTTON -->
+        <a href="job-finder.html"
+           data-premium
+           data-label="Job Finder"
+           class="premium-btn">
+           <span class="icon">💼</span><span class="label link-text">Job Finder</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn ghost" onclick="toggleSidebar()">☰</button>
+        <div class="small-muted">All data saved locally. No accounts required.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <h1 class="h-title">Job Finder</h1>
+          <div class="h-sub">Discover careers that match your skills, major, and personality.</div>
+        </div>
+      </div>
+
+      <!-- BLOCK PAGE IF NOT PREMIUM -->
+      <div id="premiumBlock" class="premium-block hidden">
+        <h2>This feature is Premium</h2>
+        <p>Please activate premium to unlock the Job Finder.</p>
+      </div>
+
+      <div id="jobContent" class="grid hidden">
+        <div class="card">
+          <h2>Your Profile</h2>
+
+          <label class="label">Intended Major</label>
+          <input id="jf_major" placeholder="e.g. Computer Science" />
+
+          <label class="label">Skills</label>
+          <input id="jf_skills" placeholder="e.g. coding, writing, teamwork" />
+
+          <label class="label">Interests</label>
+          <input id="jf_interests" placeholder="e.g. cybersecurity, teaching, design" />
+
+          <label class="label">Work Environment Preference</label>
+          <input id="jf_env" placeholder="e.g. remote, office, outdoors" />
+
+          <label class="label">Extra Notes</label>
+          <input id="jf_notes" placeholder="optional preferences" />
+
+          <div class="row">
+            <button class="btn" id="genJobs">Generate</button>
+            <button class="btn outline" onclick="downloadOutput('jobOutput','job-matches')">Download</button>
+            <button class="btn ghost" id="clearJobInputs">Clear</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Results</h2>
+          <div id="jobOutput" class="output" data-save="jobData"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      // Premium gate for the page
+      if (!requirePremium("jobFinder")) {
+        document.getElementById("premiumBlock").classList.remove("hidden");
+        return;
+      } else {
+        document.getElementById("jobContent").classList.remove("hidden");
+      }
+
+      const gen = document.getElementById("genJobs");
+
+      gen.addEventListener("click", () => {
+        const prompt = `
+You are a career advisor. Based on this student profile:
+
+• Major: ${document.getElementById("jf_major").value}
+• Skills: ${document.getElementById("jf_skills").value}
+• Interests: ${document.getElementById("jf_interests").value}
+• Preferred Work Environment: ${document.getElementById("jf_env").value}
+• Notes: ${document.getElementById("jf_notes").value}
+
+Provide **6 career matches**.
+
+For each career include:
+- Job Title
+- 1–2 sentence personalized reason
+- Salary Range (USD)
+- Required Degree / Training
+- Job Demand (0–100)
+- Work-Life Balance Score
+- Difficulty of Entry (0–100)
+
+Make clean sections with headings.
+`;
+
+        generateAndRender(prompt, "jobOutput", "jobData");
+      });
+
+      document.getElementById("clearJobInputs").addEventListener("click", () => {
+        ["jf_major","jf_skills","jf_interests","jf_env","jf_notes"].forEach(id => {
+          document.getElementById(id).value = "";
+          save(id,"");
+        });
+
+        document.getElementById("jobOutput").innerHTML = "";
+        save("jobData","");
+      });
+    });
+  </script>
+</body>
+</html>
