@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PrepSet - Premium Activation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <main class="main center-box">
+    <h1>Activate Premium</h1>
+
+    <label class="label">Enter Monthly Key</label>
+    <input id="premiumKeyInput" placeholder="PREPSET-2025-MONTH01" class="large-input"/>
+
+    <button class="btn" onclick="submitPremiumKey()">Activate</button>
+
+    <div id="keyResult" class="result-text"></div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+
+<script>
+  function submitPremiumKey() {
+    const key = document.getElementById("premiumKeyInput").value.trim();
+    const result = document.getElementById("keyResult");
+
+    // VALID KEYS FOR THIS MONTH — update these manually each month
+    const VALID_KEYS = [
+      "PREPSET-2025-JAN",
+      "PREPSET-2025-JAN-1",
+      "PREPSET-2025-JAN-2"
+    ];
+
+    // optional: used keys are saved so they cannot be reused
+    let usedKeys = JSON.parse(localStorage.getItem("usedPremiumKeys") || "[]");
+
+    if (usedKeys.includes(key)) {
+      result.textContent = "This key was already used.";
+      result.style.color = "#ff4444";
+      return;
+    }
+
+    if (VALID_KEYS.includes(key)) {
+      activatePremium(30); // unlock for 30 days
+      usedKeys.push(key);
+      localStorage.setItem("usedPremiumKeys", JSON.stringify(usedKeys));
+
+      result.textContent = "Premium Activated! 🎉 Expires in 30 days.";
+      result.style.color = "#00ff99";
+    } else {
+      result.textContent = "Invalid Key";
+      result.style.color = "#ff4444";
+    }
+  }
+</script>
+
+</body>
+</html>
