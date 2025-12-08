@@ -200,89 +200,104 @@ function bookmarkPage() {
     }
 }
 
-/* =============================
-   PREMIUM SUBSCRIPTION SYSTEM
-   Monthly Key + 30 Days Access
-   ============================= */
+/* =========================
+   Premium Key System (PREPSET-XXXXXXXXXX)
+   ========================= */
 
-const PREMIUM_KEY = "prepset_premium_active";
-const PREMIUM_EXPIRATION = "prepset_premium_expires";
-const PREMIUM_FEATURES = {
-  "jobFinder": true,
-  "careerAnalyzer": true
-};
+// Example allowed keys
+const PREMIUM_KEYS = [
+  "PREPSET-1A2B3C4D5E",
+  "PREPSET-9F8G7H6J5K"
+];
 
-// check if premium active
+// Duration of premium in milliseconds (30 days)
+const PREMIUM_DURATION = 30 * 24 * 60 * 60 * 1000;
+
+// Regex to validate key format
+const KEY_REGEX = /^PREPSET-[A-Z0-9]{10}$/i;
+
+// ----------------------
+// Save key and expiration
+// ----------------------
+function activatePremium(key) {
+  if (KEY_REGEX.test(key) && PREMIUM_KEYS.includes(key.toUpperCase())) {
+    const expiry = Date.now() + PREMIUM_DURATION;
+    localStorage.setItem("premiumExpiry", expiry);
+    localStorage.setItem("premiumKey", key.toUpperCase());
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// ----------------------
+// Check if premium is active
+// ----------------------
 function isPremiumActive() {
-  const active = localStorage.getItem(PREMIUM_KEY);
-  const exp = Number(localStorage.getItem(PREMIUM_EXPIRATION));
-
-  if (!active || !exp) return false;
-
-  if (Date.now() > exp) {
-    deactivatePremium();
-    return false;
-  }
-  return true;
+  const expiry = parseInt(localStorage.getItem("premiumExpiry") || "0");
+  return Date.now() < expiry;
 }
 
-// activate premium for X days
-function activatePremium(days = 30) {
-  const expiresAt = Date.now() + days * 24 * 60 * 60 * 1000;
-
-  localStorage.setItem(PREMIUM_KEY, "true");
-  localStorage.setItem(PREMIUM_EXPIRATION, expiresAt.toString());
-
-  updatePremiumUI();
-}
-
-// deactivate (after expiration)
-function deactivatePremium() {
-  localStorage.removeItem(PREMIUM_KEY);
-  localStorage.removeItem(PREMIUM_EXPIRATION);
-
-  updatePremiumUI();
-}
-
-// premium UI lock/unlock
-function updatePremiumUI() {
-  const premium = isPremiumActive();
-
-  document.querySelectorAll("[data-premium]").forEach(btn => {
-    const label = btn.dataset.label;
-
-    if (premium) {
-      btn.classList.remove("locked");
-      btn.textContent = label;
-    } else {
-      btn.classList.add("locked");
-      btn.textContent = label + " (Premium)";
-    }
-  });
-}
-
-// protect premium pages
-function requirePremium(featureKey) {
-  if (!PREMIUM_FEATURES[featureKey]) return true;
-  if (!isPremiumActive()) {
-    alert("This feature requires an active Premium subscription.");
-    return false;
-  }
-  return true;
-}
-
-// run UI update on load
-document.addEventListener("DOMContentLoaded", updatePremiumUI);
-
-document.addEventListener("DOMContentLoaded", () => {
+// ----------------------
+// Lock/unlock all premium buttons
+// ----------------------
+function updatePremiumButtons() {
   const premiumActive = isPremiumActive();
   document.querySelectorAll("[data-premium='true']").forEach(btn => {
-    if (!premiumActive) {
+    if (premiumActive) {
+      btn.classList.remove("locked");
+    } else {
       btn.classList.add("locked");
       btn.addEventListener("click", e => {
         e.preventDefault();
-        window.location.href = "premium.html";
+        alert("This is a premium feature. Please activate premium.");
       });
     }
   });
+}
+
+// ----------------------
+// Feature-specific premium check
+// ----------------------
+function requirePremium(featureName = "") {
+  if (!isPremiumActive()) {
+    const premiumBlock = document.getElementById("premiumBlock");
+    if (premiumBlock) premiumBlock.classList.remove("hidden");
+
+    const contentBlock = document.getElementById(`${featureName}Content`);
+    if (contentBlock) contentBlock.classList.add("hidden");
+
+    return false;
+  } else {
+    const premiumBlock = document.getElementById("premiumBlock");
+    if (premiumBlock) premiumBlock.classList.add("hidden");
+
+    const contentBlock = document.getElementById(`${featureName}Content`);
+    if (contentBlock) contentBlock.classList.remove("hidden");
+
+    return true;
+  }
+}
+
+// ----------------------
+// Prompt for new key
+// ----------------------
+function promptPremiumKey() {
+  const key = prompt("Enter your premium key (format: PREPSET-XXXXXXXXXX):");
+  if (!key) return;
+  if (activatePremium(key)) {
+    alert("Premium activated! Features unlocked for 30 days.");
+    updatePremiumButtons();
+    location.reload();
+  } else {
+    alert("Invalid key or wrong format. Must be PREPSET-XXXXXXXXXX");
+  }
+}
+
+// ----------------------
+// Initialization
+// ----------------------
+document.addEventListener("DOMContentLoaded", () => {
+  updatePremiumButtons();
 });
+
