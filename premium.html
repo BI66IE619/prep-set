@@ -3,60 +3,95 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PrepSet - Premium Activation</title>
+  <title>PrepSet - Activate Premium</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .premium-container {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    }
+
+    .premium-container input {
+      width: 80%;
+      padding: 10px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+
+    .premium-container button {
+      margin-top: 12px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: gold;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .premium-timer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
-
-<div class="app">
-  <main class="main center-box">
+  <div class="premium-container">
     <h1>Activate Premium</h1>
+    <p>Enter your premium key (format: PREPSET-XXXXXXXXXX)</p>
+    <input type="text" id="premiumKeyInput" placeholder="PREPSET-XXXXXXXXXX">
+    <br>
+    <button id="activateBtn">Activate</button>
+    <div class="premium-timer" id="premiumTimer"></div>
+  </div>
 
-    <label class="label">Enter Monthly Key</label>
-    <input id="premiumKeyInput" placeholder="PREPSET-2025-MONTH01" class="large-input"/>
+  <script src="app.js"></script>
+  <script>
+    function updateTimer() {
+      const expiry = parseInt(localStorage.getItem("premiumExpiry") || "0");
+      const now = Date.now();
+      const diff = expiry - now;
 
-    <button class="btn" onclick="submitPremiumKey()">Activate</button>
+      if (diff <= 0) {
+        document.getElementById("premiumTimer").innerText = "Premium expired.";
+        return;
+      }
 
-    <div id="keyResult" class="result-text"></div>
-  </main>
-</div>
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+      const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+      const seconds = Math.floor((diff % (1000*60)) / 1000);
 
-<script src="app.js"></script>
-
-<script>
-  function submitPremiumKey() {
-    const key = document.getElementById("premiumKeyInput").value.trim();
-    const result = document.getElementById("keyResult");
-
-    // VALID KEYS FOR THIS MONTH — update these manually each month
-    const VALID_KEYS = [
-      "PREPSET-29fbvownvse3",
-      "PREPSET-mbioebt4feek",
-      "PREPSET-09fgho65dww3"
-    ];
-
-    // optional: used keys are saved so they cannot be reused
-    let usedKeys = JSON.parse(localStorage.getItem("usedPremiumKeys") || "[]");
-
-    if (usedKeys.includes(key)) {
-      result.textContent = "This key was already used.";
-      result.style.color = "#ff4444";
-      return;
+      document.getElementById("premiumTimer").innerText =
+        `Premium expires in ${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
 
-    if (VALID_KEYS.includes(key)) {
-      activatePremium(30); // unlock for 30 days
-      usedKeys.push(key);
-      localStorage.setItem("usedPremiumKeys", JSON.stringify(usedKeys));
+    // Run timer every second
+    setInterval(updateTimer, 1000);
+    updateTimer();
 
-      result.textContent = "Premium Activated! 🎉 Expires in 30 days.";
-      result.style.color = "#00ff99";
-    } else {
-      result.textContent = "Invalid Key";
-      result.style.color = "#ff4444";
-    }
-  }
-</script>
-
+    // Activate key on button click
+    document.getElementById("activateBtn").addEventListener("click", () => {
+      const key = document.getElementById("premiumKeyInput").value;
+      if (!key) return;
+      if (activatePremium(key)) {
+        alert("Premium activated! Features unlocked for 30 days.");
+        updatePremiumButtons();
+        updateTimer();
+      } else {
+        alert("Invalid key or wrong format. Must be PREPSET-XXXXXXXXXX");
+      }
+    });
+  </script>
 </body>
 </html>
