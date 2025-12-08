@@ -199,3 +199,76 @@ function bookmarkPage() {
         alert('Press Ctrl+D (Cmd+D on Mac) to bookmark this page.');
     }
 }
+
+/* ===========================
+   PREMIUM KEY SYSTEM (GLOBAL)
+   =========================== */
+
+const PREMIUM_KEY = "prepset_premium_active";
+const PREMIUM_EXPIRATION = "prepset_premium_expires";
+
+const PREMIUM_FEATURES = {
+  jobFinder: true,
+  majorCareerAnalyzer: true,
+  // Add more:
+  // essayRewritePro: true,
+  // interviewSimPro: true,
+};
+
+// Check if premium is active AND not expired
+function isPremiumActive() {
+  const active = localStorage.getItem(PREMIUM_KEY);
+  const exp = Number(localStorage.getItem(PREMIUM_EXPIRATION));
+
+  if (!active || !exp) return false;
+  if (Date.now() > exp) {
+    deactivatePremium();
+    return false;
+  }
+  return true;
+}
+
+// Activate premium for X days (default 30)
+function activatePremium(days = 30) {
+  const exp = Date.now() + days * 86400000;
+  localStorage.setItem(PREMIUM_KEY, "true");
+  localStorage.setItem(PREMIUM_EXPIRATION, exp.toString());
+  updatePremiumUI();
+}
+
+// Remove premium immediately
+function deactivatePremium() {
+  localStorage.removeItem(PREMIUM_KEY);
+  localStorage.removeItem(PREMIUM_EXPIRATION);
+  updatePremiumUI();
+}
+
+// Lock or unlock sidebar premium buttons
+function updatePremiumUI() {
+  const active = isPremiumActive();
+
+  document.querySelectorAll("[data-premium]").forEach(el => {
+    const label = el.dataset.label;
+
+    if (active) {
+      el.classList.remove("locked");
+      el.innerHTML = `<span class="icon">${el.querySelector('.icon')?.textContent || ""}</span><span class="label link-text">${label}</span>`;
+    } else {
+      el.classList.add("locked");
+      el.innerHTML = `<span class="icon">${el.querySelector('.icon')?.textContent || ""}</span><span class="label link-text">${label} (Premium)</span>`;
+    }
+  });
+}
+
+// Protect premium pages
+function requirePremium(featureKey) {
+  if (!PREMIUM_FEATURES[featureKey]) return true;
+
+  if (!isPremiumActive()) {
+    alert("This is a Premium feature. Please subscribe to unlock it.");
+    return false;
+  }
+  return true;
+}
+
+document.addEventListener("DOMContentLoaded", updatePremiumUI);
