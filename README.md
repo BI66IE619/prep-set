@@ -94,6 +94,7 @@ Copy code
 /essay.html        ← Essay helper
 /resume.html       ← Resume builder
 /interview.html    ← Interview practice
+/gpa.html          ← GPA calculator
 /style.css         ← Main styling for all pages
 /app.js            ← JavaScript: AI calls, localStorage, sidebar, rendering, download
 🛠️ Tech Stack
