@@ -274,3 +274,15 @@ function requirePremium(featureKey) {
 // run UI update on load
 document.addEventListener("DOMContentLoaded", updatePremiumUI);
 
+document.addEventListener("DOMContentLoaded", () => {
+  const premiumActive = isPremiumActive();
+  document.querySelectorAll("[data-premium='true']").forEach(btn => {
+    if (!premiumActive) {
+      btn.classList.add("locked");
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        window.location.href = "premium.html";
+      });
+    }
+  });
+});
