@@ -295,26 +295,25 @@ textarea{min-height:120px;resize:vertical}
   font-size: 14px;
 }
 
-/* Premium Lock Styling */
 .locked {
   opacity: 0.5;
   pointer-events: none;
 }
 
-.premium-block {
-  padding: 30px;
-  text-align: center;
-  background: #131a2a;
-  color: white;
-  border-radius: 12px;
-  margin-top: 20px;
-  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+.center-box {
+  max-width: 400px;
+  margin: auto;
+  margin-top: 80px;
 }
 
-.hidden {
-  display: none;
+.large-input {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
 }
 
-.premium-btn .label {
-  margin-left: 8px;
+.result-text {
+  margin-top: 12px;
+  font-size: 1rem;
 }
