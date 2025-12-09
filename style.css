@@ -317,13 +317,3 @@ textarea{min-height:120px;resize:vertical}
   margin-top: 12px;
   font-size: 1rem;
 }
-
-.section-title {
-  padding-left: 8px;
-  margin: 8px 0 4px;
-  font-size: 12px;
-  opacity: .6;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #ccc;
-}
