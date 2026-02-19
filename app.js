@@ -52,55 +52,80 @@ function restoreOutputs(){
 }
 
 /* ==========================================================
-   MARKDOWN → HTML FORMATTER
+   MARKDOWN → HTML FORMATTER (FIXED)
 =========================================================== */
 
-function renderStyled(md){
-    if(!md) return "";
-    md = md.replace(/\r\n/g,"\n");
+function renderStyled(md) {
+    if (!md) return "";
+    
+    // Normalize line endings and escape HTML tags to prevent injection
+    let html = md.replace(/\r\n/g, "\n")
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;");
 
-    md = md.replace(/^### (.*)$/gm, "<h3>$1</h3>");
-    md = md.replace(/^## (.*)$/gm, "<h2>$1</h2>");
-    md = md.replace(/^# (.*)$/gm,  "<h1>$1</h1>");
-    md = md.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    md = md.replace(/\*(.*?)\*/g, "<em>$1</em>");
+    // 1. Headers (### Header)
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
 
-    const lines = md.split("\n");
-    let out = "";
-    let inUl=false, inOl=false;
+    // 2. Bold and Italic (**bold**, *italic*)
+    html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-    for(const line of lines){
-        const t = line.trim();
-        if(!t){
-            if(inUl){ out+="</ul>"; inUl=false; }
-            if(inOl){ out+="</ol>"; inOl=false; }
-            continue;
+    // 3. Tables (Crucial for GPA results)
+    const lines = html.split('\n');
+    let inTable = false;
+    let tableHtml = "";
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Detect table row (starts and ends with |)
+        if (line.startsWith('|') && line.endsWith('|')) {
+            if (!inTable) {
+                tableHtml = '<table><thead>';
+                inTable = true;
+            }
+
+            const cells = line.split('|').filter(cell => cell.trim() !== "");
+            const isDivider = line.includes('---');
+
+            if (isDivider) {
+                tableHtml = tableHtml.replace('</thead>', '<tbody>');
+                continue;
+            }
+
+            const tag = tableHtml.includes('<tbody>') ? 'td' : 'th';
+            tableHtml += '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+            
+            // If it's the last line or next line isn't a table, close it
+            if (i === lines.length - 1 || !lines[i+1].trim().startsWith('|')) {
+                tableHtml += '</tbody></table>';
+                lines[i] = tableHtml;
+                inTable = false;
+            } else {
+                lines[i] = ""; // Clear line as it's swallowed by tableHtml
+            }
         }
-
-        const ol = t.match(/^\d+\.\s+(.*)/);
-        if(ol){
-            if(!inOl){ out+="<ol>"; inOl=true; }
-            out += "<li>"+ol[1]+"</li>";
-            continue;
-        }
-
-        const ul = t.match(/^[-*•]\s+(.*)/);
-        if(ul){
-            if(!inUl){ out+="<ul>"; inUl=true; }
-            out += "<li>"+ul[1]+"</li>";
-            continue;
-        }
-
-        if(inUl){ out+="</ul>"; inUl=false; }
-        if(inOl){ out+="</ol>"; inOl=false; }
-        out += "<p>"+t+"</p>";
     }
+    
+    html = lines.join('\n');
 
-    if(inUl) out+="</ul>";
-    if(inOl) out+="</ol>";
-    return out;
+    // 4. Lists (Unordered and Ordered)
+    html = html.replace(/^\s*[-*•]\s+(.*)/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    
+    // 5. Paragraphs (Wrap remaining naked text, but skip tags)
+    html = html.split('\n').map(line => {
+        if (!line.trim()) return "";
+        if (line.startsWith('<')) return line;
+        return `<p>${line}</p>`;
+    }).join('\n');
+
+    return html;
 }
-
 /* ==========================================================
    NEW AI CALL (secure — uses /api/generate.js)
 =========================================================== */
